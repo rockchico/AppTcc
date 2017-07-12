@@ -1,0 +1,37 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {}
+    },
+    "installed_plugins": {
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "com.example.AppTcc"
+        },
+        "cordova-plugin-device-motion": {
+            "PACKAGE_NAME": "com.example.AppTcc"
+        },
+        "cordova-plugin-media-capture": {
+            "PACKAGE_NAME": "com.example.AppTcc"
+        },
+        "cordova-plugin-file-transfer": {
+            "PACKAGE_NAME": "com.example.AppTcc"
+        },
+        "cordova-sqlite-storage": {
+            "PACKAGE_NAME": "com.example.AppTcc"
+        },
+        "cordova-plugin-http": {
+            "PACKAGE_NAME": "com.example.AppTcc"
+        }
+    },
+    "dependent_plugins": {
+        "cordova-plugin-compat": {
+            "PACKAGE_NAME": "com.example.AppTcc"
+        },
+        "cordova-plugin-file": {
+            "PACKAGE_NAME": "com.example.AppTcc"
+        }
+    }
+}

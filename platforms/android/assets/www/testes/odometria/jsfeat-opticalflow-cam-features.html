@@ -1,0 +1,264 @@
+<!doctype html>
+
+<html>
+<head>
+    <title>tracking.js -  feature detector with camera</title>
+
+    <meta charset="utf-8">
+
+
+    <script src="../../js/tracking.js"></script>
+    <script src="../../js/jsfeat-min.js"></script>
+
+    <style>
+        #video {
+            position: absolute;
+            top: -1000px;
+        }
+
+        #canvas {
+            left: 50%;
+            top: 50%;
+            margin-left: -200px;
+            margin-top: -150px;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+
+<div class="demo-frame">
+    <div class="demo-container">
+        <video id="video" width="640" height="480" preload autoplay loop muted></video>
+        <canvas id="canvas1" width="800" height="300"></canvas>
+        <canvas id="canvas2" width="800" height="300"></canvas>
+    </div>
+</div>
+
+<script>
+
+    var curr_img_pyr, prev_img_pyr, point_count, point_status, prev_xy, curr_xy;
+
+    var canvas1 = document.getElementById('canvas1');
+    var context1 = canvas1.getContext('2d');
+
+    var canvas2 = document.getElementById('canvas2');
+    var context2 = canvas2.getContext('2d');
+
+
+    var video = document.getElementById('video');
+
+    context1.fillStyle = "rgb(0,255,0)";
+    context1.strokeStyle = "rgb(0,255,0)";
+
+    curr_img_pyr = new jsfeat.pyramid_t(3);
+    prev_img_pyr = new jsfeat.pyramid_t(3);
+    curr_img_pyr.allocate(640, 480, jsfeat.U8_t|jsfeat.C1_t);
+    prev_img_pyr.allocate(640, 480, jsfeat.U8_t|jsfeat.C1_t);
+
+    point_count = 0;
+    point_status = new Uint8Array(100*2);
+    prev_xy = new Float32Array(100*2);
+    curr_xy = new Float32Array(100*2);
+
+    var win_size = 20;
+    var max_iterations = 30;
+    var epsilon = 0.01;
+    var min_eigen = 0.001;
+
+    var max_allowed = 25;
+
+    var lap_thres = 20;
+    var eigen_thres = 20;
+
+
+    var Tracker = function() {
+        Tracker.base(this, 'constructor');
+    };
+    tracking.inherits(Tracker, tracking.Tracker);
+
+
+    Tracker.prototype.track = function(pixels, width, height) {
+
+        //context1.clearRect(0, 0, canvas1.width, canvas1.height);
+
+
+        //console.log(pixels);
+
+        var dataBuffer = new jsfeat.data_t(width * height, pixels);
+
+        //console.log(imageData.data);
+
+        var mat = new jsfeat.matrix_t(width, height, jsfeat.U8C4_t, dataBuffer);
+        var matGray = new jsfeat.matrix_t(mat.cols, mat.rows, jsfeat.U8C1_t);
+        jsfeat.imgproc.grayscale(mat.data, mat.cols, mat.rows, matGray);
+        var matBlurred = new jsfeat.matrix_t(mat.cols, mat.rows, jsfeat.U8C1_t);
+
+        jsfeat.imgproc.gaussian_blur(matGray, matBlurred, 5);
+        var corners = [];
+        var i = 200;
+        while (--i >= 0) {
+            corners[i] = new jsfeat.keypoint_t(0, 0, 0, 0, -1);
+        }
+
+        var threshold = 10;
+        jsfeat.fast_corners.set_threshold(threshold);
+        var count = jsfeat.fast_corners.detect(matBlurred, corners, 3);
+
+
+        //jsfeat.yape06.laplacian_threshold = lap_thres|0;
+        //jsfeat.yape06.min_eigen_value_threshold = eigen_thres|0;
+        //var count = jsfeat.yape06.detect(matBlurred, corners, 17);
+
+
+        //for (i = 0; i < count; i++) {
+        //    context1.fillStyle = '#0f0';
+        //    context1.fillRect(corners[i].x, corners[i].y, 3, 3);
+        //}
+        // sort by score and reduce the count if needed
+        if(count > max_allowed) {
+            jsfeat.math.qsort(corners, 0, count-1, function(a,b){return (b.score<a.score);});
+            count = max_allowed;
+        }
+
+        console.log("número corners = "+ count);
+
+        //console.log(corners);
+
+
+
+
+        this.emit('track', {
+            corners: corners,
+            count: count,
+            pixels: pixels,
+            matGray: matGray
+
+        });
+    };
+
+    function draw_circle(ctx, x, y) {
+
+        //var color = '#' + Math.floor(Math.random() * 16777215).toString(16);
+        //ctx.fillStyle = color;
+        //ctx.strokeStyle = color;
+
+        ctx.fillStyle = "#00f";
+        ctx.strokeStyle = "#00f";
+
+        ctx.beginPath();
+        ctx.arc(x, y, 1, 0, Math.PI*2, true);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    function prune_oflow_points(ctx) {
+        var n = point_count;
+        var i=0,j=0;
+
+        for(; i < n; ++i) {
+            if(point_status[i] == 1) {
+                if(j < i) {
+                    curr_xy[j<<1] = curr_xy[i<<1];
+                    curr_xy[(j<<1)+1] = curr_xy[(i<<1)+1];
+                }
+                draw_circle(ctx, curr_xy[j<<1], curr_xy[(j<<1)+1]);
+                ++j;
+            }
+        }
+        point_count = j;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    var tracker1 = new Tracker();
+
+    var keypoints_x = null;
+    var keypoints_x1 = null;;
+
+
+    tracker1.on('track', function(event) {
+
+        context1.clearRect(0, 0, canvas1.width, canvas1.height);
+
+        point_count = 0;
+
+
+
+
+        var count = event.count;
+        var corners = event.corners;
+        for (i = 0; i < count; i++) {
+            //context1.fillStyle = '#0f0';
+            //context1.fillRect(corners[i].x, corners[i].y, 3, 3);
+
+            curr_xy[i<<1] = corners[i].x;
+            curr_xy[(i<<1)+1] = corners[i].y;
+            point_count++;
+        }
+
+
+        // swap flow data
+        var _pt_xy = prev_xy;
+        prev_xy = curr_xy;
+        curr_xy = _pt_xy;
+        var _pyr = prev_img_pyr;
+        prev_img_pyr = curr_img_pyr;
+        curr_img_pyr = _pyr;
+
+
+
+
+        //jsfeat.imgproc.grayscale(event.pixels, 640, 480, curr_img_pyr.data[0]);
+
+        curr_img_pyr.data[0] = event.matGray;
+
+        //console.log(event.matGray);
+        //console.log(curr_img_pyr.data[0]);
+
+        curr_img_pyr.build(curr_img_pyr.data[0], true);
+
+
+        //console.log("antes ");
+        //console.log(curr_xy);
+        //console.log(prev_xy);
+        //console.log("***********************************************");
+
+        jsfeat.optical_flow_lk.track(prev_img_pyr, curr_img_pyr, prev_xy, curr_xy, point_count, win_size|0, max_iterations|0, point_status, epsilon, min_eigen);
+
+        //console.log("depois ");
+        //console.log(curr_xy);
+        //console.log(prev_xy);
+
+        //console.log(point_count);
+        //console.log(point_status);
+
+        prune_oflow_points(context1);
+
+
+
+
+    });
+
+
+    tracking.track('#video', tracker1, { camera: true });
+    //tracking.track('#video', tracker1, { camera: true });
+
+
+
+</script>
+</body>
+</html>

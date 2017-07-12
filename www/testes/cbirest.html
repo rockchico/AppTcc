@@ -1,0 +1,146 @@
+<!doctype html>
+
+<html>
+<head>
+    <title>CBIRest</title>
+
+    <meta charset="utf-8">
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+
+
+    <style>
+
+        #imageCapture {
+            font-size: 48pt;
+        }
+
+        #videoCapture {
+            font-size: 48pt;
+        }
+
+    </style>
+</head>
+<body>
+
+<button id="imageCapture">IMAGE</button>
+<button id="videoCapture">VIDEO</button>
+
+<script>
+
+
+    window.onload = function () {
+        "use strict";
+
+
+        var uri = encodeURI("http://admin:admin@192.168.0.114:9999/api/images");
+
+        function imageCapture() {
+
+            var imageCaptured = "";
+            var fileURL = "";
+            var mimeType = "";
+
+
+            var optionsCapture = {
+                limit: 1
+            };
+            navigator.device.capture.captureImage(onSuccess, onError, optionsCapture);
+
+            function onSuccess(mediaFiles) {
+                var i, path, len;
+                for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+                    path = mediaFiles[i].fullPath;
+                    console.log(mediaFiles);
+                    imageCaptured = mediaFiles;
+                    fileURL = imageCaptured[0].localURL;
+                    mimeType = imageCaptured[0].type;
+
+                    doUpload();
+                }
+            }
+
+            function onError(error) {
+                navigator.notification.alert('Error code: ' + error.code, null, 'Capture Error');
+            }
+
+            // upload
+            function win(r) {
+                console.log("Code = " + r.responseCode);
+                console.log("Response = " + r.response);
+                console.log("Sent = " + r.bytesSent);
+            }
+
+            function fail(error) {
+                alert("An error has occurred: Code = " + error.code);
+                console.log("upload error source " + error.source);
+                console.log("upload error target " + error.target);
+            }
+
+            function doUpload() {
+
+
+                var options = new FileUploadOptions();
+                options.fileKey = "file";
+                options.fileName = fileURL.substr(fileURL.lastIndexOf('/')+1);
+                options.mimeType = mimeType;
+
+                //var headers={'headerParam':'headerValue'};
+
+                //options.headers = headers;
+
+                var params = {};
+                params.keys = "x;y";
+                params.values = "10;11";
+
+                options.params = params;
+
+                var ft = new FileTransfer();
+                ft.onprogress = function(progressEvent) {
+                    if (progressEvent.lengthComputable) {
+                        loadingStatus.setPercentage(progressEvent.loaded / progressEvent.total);
+                    } else {
+                        loadingStatus.increment();
+                    }
+                };
+                ft.upload(fileURL, uri, win, fail, options);
+            }
+            // fim upload
+
+        }
+
+
+        function videoCapture() {
+            var options = {
+                limit: 1,
+                duration: 10
+            };
+            navigator.device.capture.captureVideo(onSuccess, onError, options);
+
+            function onSuccess(mediaFiles) {
+                var i, path, len;
+                for (i = 0, len = mediaFiles.length; i < len; i += 1) {
+                    path = mediaFiles[i].fullPath;
+                    console.log(mediaFiles);
+                }
+            }
+
+            function onError(error) {
+                navigator.notification.alert('Error code: ' + error.code, null, 'Capture Error');
+            }
+        }
+
+
+
+        document.getElementById("imageCapture").addEventListener("click", imageCapture);
+        document.getElementById("videoCapture").addEventListener("click", videoCapture);
+
+    }
+
+
+
+
+</script>
+</body>
+</html>
