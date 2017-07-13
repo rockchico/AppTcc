@@ -77,7 +77,7 @@ myApp.onPageInit('sobre', function (page) {
 
 })
 
-myApp.onPageInit('localizar', function (page) {
+myApp.onPageInit('mapa', function (page) {
     // Do something here for "about" page
     //myApp.alert('Here comes About page');
 
@@ -85,7 +85,44 @@ myApp.onPageInit('localizar', function (page) {
         imageCapture();
     });
 
+    $$('#btnSelectOrigin').on('click', function () {
+        myApp.popup('#popup-origin');
+    });
+
+    $$('#btnSelectDestination').on('click', function () {
+        myApp.popup('#popup-destination');
+    });
+
+    $$('#popup-origin').on('popup:opened', function () {
+        console.log('About Popup opened')
+    });
+
+    // Fruits data demo array
+    var fruits = ('Apple Apricot Avocado Banana Melon Orange Peach Pear Pineapple').split(' ');
+
+    // Simple Dropdown
+    var autocompleteDropdownSimple = myApp.autocomplete({
+        input: '#autocomplete-dropdown',
+        openIn: 'dropdown',
+        source: function (autocomplete, query, render) {
+            var results = [];
+            if (query.length === 0) {
+                render(results);
+                return;
+            }
+            // Find matched items
+            for (var i = 0; i < fruits.length; i++) {
+                if (fruits[i].toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(fruits[i]);
+            }
+            // Render items by passing array with result items
+            render(results);
+        }
+    });
+
 })
+
+
+
 
 myApp.onPageInit('imagens', function (page) {
     // Do something here for "about" page
@@ -480,7 +517,7 @@ function imageCapture() {
 
         var params = {};
         params.id = this.lastInsertId;
-        params.keys = "place_id"; 
+        params.keys = "place_id";
         params.values = ""+this.place_id+"";
 
         options.params = params;
