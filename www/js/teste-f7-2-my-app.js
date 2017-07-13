@@ -81,20 +81,22 @@ myApp.onPageInit('mapa', function (page) {
     // Do something here for "about" page
     //myApp.alert('Here comes About page');
 
-    $$('#btnCapturarImagem').on('click', function (e) {
-        imageCapture();
-    });
-
     $$('#btnSelectOrigin').on('click', function () {
-        myApp.popup('#popup-origin');
+        var imageCapture = new ImageCapture();
+        this.uri = "http://"+appTccServer+":9999/api/search";
+        imageCapture.doCapture();
+
+        var uploadREsponse = imageCapture.getUploadResponse();
+
+
     });
 
     $$('#btnSelectDestination').on('click', function () {
         myApp.popup('#popup-destination');
     });
 
-    $$('#popup-origin').on('popup:opened', function () {
-        console.log('About Popup opened')
+    $$('#popup-destination').on('popup:opened', function () {
+        console.log('popup-destination Popup opened')
     });
 
     // Fruits data demo array
@@ -230,11 +232,11 @@ myApp.onPageInit('place-images', function (page) {
             var place_id = obj.jsonResponse.place_id;
 
 
-            var imgCapture = new imageCapture();
-            imgCapture.lastInsertId = lastInsertId;
-            imgCapture.place_id = place_id;
+            var imageCapture = new ImageCapture();
+            imageCapture.uri = "http://admin:admin@"+appTccServer+":9999/api/images";
+            imageCapture.uploadParams = {id: lastInsertId, keys: "place_id", values: ""+place_id+""}
 
-            imgCapture.doCapture();
+            imageCapture.doCapture();
 
 
 
@@ -443,19 +445,26 @@ $$(document).on('pageInit', '.page[data-page="about"]', function (e) {
 
 // ##########################################################################
 
+/*
+*
+*  Objeto que faz a captura da imaagem e upload para uri de destino
+*
+*
+* */
 
-
-function imageCapture() {
+function ImageCapture() {
 
     //var uri = encodeURI("http://10.1.0.10/AppTcc-backend/images/create");
-    this.uri = encodeURI("http://admin:admin@"+appTccServer+":9999/api/images");
+    this.uri = "";
 
     this.imageCaptured = "";
     this.fileURL = "";
     this.mimeType = "";
 
-    this.place_id = "";
-    this.lastInsertId = "";
+    var uploadResponse = "" // variável privada
+
+    this.uploadParams = {};
+
 
     //console.log(navigator.device.capture);
 
@@ -495,6 +504,10 @@ function imageCapture() {
         console.log("Code = " + r.responseCode);
         console.log("Response = " + r.response);
         console.log("Sent = " + r.bytesSent);
+
+        uploadResponse = r.response;
+
+
     }
 
     this.OnUploadFail = function (error) {
@@ -502,6 +515,14 @@ function imageCapture() {
         console.log("upload error source " + error.source);
         console.log("upload error target " + error.target);
     }
+
+
+    this.getUploadResponse = function() {
+        return uploadResponse;
+    }
+
+
+
 
     this.doUpload = function () {
 
@@ -515,12 +536,7 @@ function imageCapture() {
 
         //options.headers = headers;
 
-        var params = {};
-        params.id = this.lastInsertId;
-        params.keys = "place_id";
-        params.values = ""+this.place_id+"";
-
-        options.params = params;
+        options.params = this.uploadParams;
 
         var ft = new FileTransfer();
         ft.onprogress = function(progressEvent) {
@@ -530,7 +546,7 @@ function imageCapture() {
                 loadingStatus.increment();
             }
         };
-        ft.upload(fileURL, this.uri, this.OnUploadSucess, this.OnUploadFail, options);
+        ft.upload(fileURL, encodeURI(this.uri), this.OnUploadSucess, this.OnUploadFail, options);
     }
     // fim upload
 
