@@ -480,7 +480,7 @@ function imageCapture() {
 
         var params = {};
         params.id = this.lastInsertId;
-        params.keys = "place_id";
+        params.keys = "place_id"; 
         params.values = ""+this.place_id+"";
 
         options.params = params;
