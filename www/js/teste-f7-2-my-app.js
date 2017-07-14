@@ -85,9 +85,10 @@ myApp.onPageInit('mapa', function (page) {
     // Do something here for "about" page
     //myApp.alert('Here comes About page');
 
-    var imageCapture = new ImageCapture();
 
-    var similar = {};
+
+    var origin = {};
+    var destination = {};
 
 
     function callBackOnUploadSucess (r) {
@@ -99,7 +100,7 @@ myApp.onPageInit('mapa', function (page) {
             console.log("passou no teste");
             var response = JSON.parse(r.response);
 
-            similar = response.data[0];
+            var similar = response.data[0];
 
             alert("Imagem enviada com sucesso! code "+r.responseCode+" \n " +
                 "id imagem mais similar = "+response.data[0].id); //"id imagem mais similar = "+data[0].id
@@ -117,8 +118,16 @@ myApp.onPageInit('mapa', function (page) {
 
                 var obj = parseJSON(response.data);
 
-                console.log("buscou imagem");
-                console.log(obj);
+                //console.log("buscou imagem");
+                //console.log(obj);
+
+                origin.place_id = obj.jsonResponse.image.place.id;
+                origin.place_name = obj.jsonResponse.image.place.name;
+                origin.x = obj.jsonResponse.image.place.x;
+                origin.y = obj.jsonResponse.image.place.y;
+
+                console.log("origin");
+                console.log(origin);
 
             }, function(response) {
                 console.error(response.error);
@@ -129,6 +138,7 @@ myApp.onPageInit('mapa', function (page) {
 
     $$('#btnSelectOrigin').on('click', function () {
 
+        var imageCapture = new ImageCapture();
         imageCapture.uri = "http://admin:admin@"+appTccServer+":9999/api/search";
         imageCapture.OnUploadSucess = callBackOnUploadSucess;
         imageCapture.doCapture();

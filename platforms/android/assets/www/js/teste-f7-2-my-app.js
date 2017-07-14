@@ -117,8 +117,16 @@ myApp.onPageInit('mapa', function (page) {
 
                 var obj = parseJSON(response.data);
 
-                console.log("buscou imagem");
-                console.log(obj);
+                //console.log("buscou imagem");
+                //console.log(obj);
+
+                similar.place_id = obj.jsonResponse.image.place.id;
+                similar.place_name = obj.jsonResponse.image.place.name;
+                similar.x = obj.jsonResponse.image.place.x;
+                similar.y = obj.jsonResponse.image.place.y;
+
+                console.log("similar");
+                console.log(similar);
 
             }, function(response) {
                 console.error(response.error);
