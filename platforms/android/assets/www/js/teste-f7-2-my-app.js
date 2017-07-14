@@ -77,17 +77,61 @@ myApp.onPageInit('sobre', function (page) {
 
 })
 
+
+
+
+
 myApp.onPageInit('mapa', function (page) {
     // Do something here for "about" page
     //myApp.alert('Here comes About page');
 
+    var imageCapture = new ImageCapture();
+
+    var similar = {};
+
+
+    function callBackOnUploadSucess (r) {
+
+        //var data = JSON.parse(r.data);
+
+        if(r.responseCode == "200") {
+
+            console.log("passou no teste");
+            var response = JSON.parse(r.response);
+
+            similar = response.data[0];
+
+            alert("Imagem enviada com sucesso! code "+r.responseCode+" \n " +
+                "id imagem mais similar = "+response.data[0].id); //"id imagem mais similar = "+data[0].id
+
+
+            var uri = encodeURI("http://"+appTccServer+"/AppTcc-backend/images/get");
+
+            cordovaHTTP.post(uri, {
+                id: similar.id
+            }, {}, function(response) {
+                console.log(response.status);
+                console.log(response);
+
+                //$$('#teste').html(response);
+
+                var obj = parseJSON(response.data);
+
+                console.log("buscou imagem");
+                console.log(obj);
+
+            }, function(response) {
+                console.error(response.error);
+            });
+
+        }
+    }
+
     $$('#btnSelectOrigin').on('click', function () {
-        var imageCapture = new ImageCapture();
-        this.uri = "http://"+appTccServer+":9999/api/search";
+
+        imageCapture.uri = "http://admin:admin@"+appTccServer+":9999/api/search";
+        imageCapture.OnUploadSucess = callBackOnUploadSucess;
         imageCapture.doCapture();
-
-        var uploadREsponse = imageCapture.getUploadResponse();
-
 
     });
 
@@ -461,7 +505,7 @@ function ImageCapture() {
     this.fileURL = "";
     this.mimeType = "";
 
-    var uploadResponse = "" // variável privada
+    var uploadResponse = {} // variável privada
 
     this.uploadParams = {};
 
@@ -473,7 +517,7 @@ function ImageCapture() {
         limit: 1
     }
 
-
+    // captura imagem ################################################################################################
     this.doCapture = function () {
         navigator.device.capture.captureImage(this.OnCatureSucess, this.onCaptureError, this.optionsCapture);
     }
@@ -498,14 +542,17 @@ function ImageCapture() {
     this.onCaptureError = function (error) {
         navigator.notification.alert('Error code: ' + error.code, null, 'Capture Error');
     }
+    // fim captura imagem ################################################################################################
 
-    // upload
+    // upload ###########################################################################################
     this.OnUploadSucess = function (r) {
         console.log("Code = " + r.responseCode);
         console.log("Response = " + r.response);
         console.log("Sent = " + r.bytesSent);
 
-        uploadResponse = r.response;
+        uploadResponse = r;
+
+        //alert("Imagem enviada com sucesso!");
 
 
     }
@@ -539,16 +586,16 @@ function ImageCapture() {
         options.params = this.uploadParams;
 
         var ft = new FileTransfer();
-        ft.onprogress = function(progressEvent) {
-            if (progressEvent.lengthComputable) {
-                loadingStatus.setPercentage(progressEvent.loaded / progressEvent.total);
-            } else {
-                loadingStatus.increment();
-            }
-        };
+        //ft.onprogress = function(progressEvent) {
+        //    if (progressEvent.lengthComputable) {
+        //        loadingStatus.setPercentage(progressEvent.loaded / progressEvent.total);
+        //    } else {
+        //        loadingStatus.increment();
+        //    }
+        //};
         ft.upload(fileURL, encodeURI(this.uri), this.OnUploadSucess, this.OnUploadFail, options);
     }
-    // fim upload
+    // fim upload ###########################################################################################
 
 }
 // ##########################################################################
