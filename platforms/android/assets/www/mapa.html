@@ -22,9 +22,22 @@
 
     <div class="page-content">
         <div class="content-block">
-            <p>Here is About page!</p>
-            <p>Fusce eros lectus, accumsan eget mi vel, iaculis tincidunt felis. Nulla tincidunt pharetra sagittis. Fusce in felis eros. Nulla sit amet aliquam lorem, et gravida ipsum. Mauris consectetur nisl non sollicitudin tristique. Praesent vitae metus ac quam rhoncus mattis vel et nisi. Aenean aliquet, felis quis dignissim iaculis, lectus quam tincidunt ligula, et venenatis turpis risus sed lorem. Morbi eu metus elit. Ut vel diam dolor.</p>
-            <div id="teste"></div>
+
+
+            <div id="content">
+
+                <div id="controls" class='clear'>
+                    <span id="message">Click on a grid position to search</span>
+                </div>
+
+                <div id="main">
+                    <div id="search_grid">Loading grid...</div>
+                </div>
+
+            </div>
+
+
+
         </div>
     </div>
 
@@ -62,10 +75,15 @@
     <!-- Fim Destination Popup -->
 
 
-    <!-- Toolbar has additional "toolbar-bottom" class -->
+    <!-- Toolbar has additional "toolbar-bottom" class
+
+    https://framework7.io/icons/
+    
+    -->
     <div class="toolbar toolbar-bottom">
         <div class="toolbar-inner">
             <p><a id="btnSelectOrigin" href="#" class="button button-big button-fill">Origem&nbsp;<i class="f7-icons">camera</i></a></p>
+            <p><a id="btnStartSearch" href="#" class="button button-big button-fill">Buscar&nbsp;<i class="f7-icons">search_strong</i></a></p>
             <p><a id="btnSelectDestination" href="#" class="button button-big button-fill">Destino</a></p>
         </div>
     </div>
