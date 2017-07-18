@@ -25,7 +25,7 @@ function GraphSearch($graph, options, implementation) {
 }
 GraphSearch.prototype.setOption = function(opt) {
     this.opts = $.extend(this.opts, opt);
-    this.drawDebugInfo();
+    //this.drawDebugInfo();
 };
 GraphSearch.prototype.initialize = function() {
     this.grid = [];
@@ -41,8 +41,8 @@ GraphSearch.prototype.initialize = function() {
     //    startSet = false;
 
 
-    var cellWidth = 10,  // -2 for border
-        cellHeight = 10,
+    var cellWidth = this.opts.cellSize,  // -2 for border
+        cellHeight = this.opts.cellSize,
         $cellTemplate = $("<span />").addClass("grid_item").width(cellWidth).height(cellHeight);
 
     var gridIndex = 0;
@@ -78,12 +78,22 @@ GraphSearch.prototype.initialize = function() {
                 if ($("#displayWeights").prop("checked")) {
                     $cell.html(cell_weight);
                 }
-                if (x == this.opts.startX && y == this.opts.startY) {
-                    $cell.addClass(css.start);
+
+                if((this.opts.startX != null) && (this.opts.startY != null)) {
+                    if (x == this.opts.startX && y == this.opts.startY) {
+                        $cell.addClass(css.start);
+                    }
                 }
-                if (x == this.opts.endX && y == this.opts.endY) {
-                    $cell.addClass(css.finish);
+
+                if((this.opts.endX != null) && (this.opts.endY != null)) {
+                    if (x == this.opts.endX && y == this.opts.endY) {
+                        $cell.addClass(css.finish);
+                    }
                 }
+
+
+
+
 
             }
         }
@@ -101,12 +111,15 @@ GraphSearch.prototype.initialize = function() {
     //    self.cellClicked($(this));
     //});
 
+    if(this.opts.initSearch == true) {
+        this.$cells = $graph.find(".grid_item");
+        $('#btnStartSearch').click(function(){
+            var end = $graph.find(".finish");
+            self.initSearch($(end));
+        });
+    }
 
-    this.$cells = $graph.find(".grid_item");
-    $('#btnStartSearch').click(function(){
-        var end = $graph.find(".finish");
-        self.initSearch($(end));
-    });
+
 
 
 };
@@ -133,10 +146,12 @@ GraphSearch.prototype.initSearch = function($end) {
 
     if(path.length === 0) {
         $("#message").text("couldn't find a path (" + duration + "ms)");
+        alert("couldn't find a path (" + duration + "ms)");
         this.animateNoPath();
     }
     else {
         $("#message").text("search took " + duration + "ms.");
+        //alert("search took " + duration + "ms.");
         this.drawDebugInfo();
         this.animatePath(path);
     }
