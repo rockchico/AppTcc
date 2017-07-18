@@ -113,7 +113,7 @@ GraphSearch.prototype.initialize = function() {
 
     if(this.opts.initSearch == true) {
         this.$cells = $graph.find(".grid_item");
-        $('#btnStartSearch').click(function(){
+        $('#'+this.opts.idBtnSearch).click(function(){
             var end = $graph.find(".finish");
             self.initSearch($(end));
         });
