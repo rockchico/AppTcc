@@ -145,7 +145,8 @@ myApp.onPageInit('mapa', function (page) {
         endY: null, // 0
         gridMatrix: gridMatrix,
         cellSize: 10,
-        initSearch: false
+        initSearch: false,
+        idBtnSearch: "btnStartSearch"
 
     };
 

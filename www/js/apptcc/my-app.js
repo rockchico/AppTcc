@@ -134,19 +134,19 @@ myApp.onPageInit('mapa', function (page) {
 
     var optsAstar = {
         wallFrequency: .1,
-        gridSizeX: 20,
-        gridSizeY: 20,
-        debug: false,
-        diagonal: true,
+        gridSizeX: 20, // numero colunas do grid
+        gridSizeY: 20, // numero linhas do grid
+        debug: false, // mostrar debug astar
+        diagonal: true, // permiri pesquisa diagonal astar
         closest: false,
-        startX: null, // 10
-        startY: null, // 10
-        endX: null, // 0
-        endY: null, // 0
+        startX: null, // posição X origem. null = não mostra
+        startY: null, // posição Y origem. null = não mostra
+        endX: null, // posição X destino. null = não mostra
+        endY: null, // // posição y destino. null = não mostra
         gridMatrix: gridMatrix,
-        cellSize: 10,
-        initSearch: false,
-        idBtnSearch: "btnStartSearch"
+        cellSize: 10, // tamanho do lado, da célula do grid
+        initSearch: false, // habilita pesquisa
+        idBtnSearch: "btnStartSearch" // id do elemento inicia pesquisa, onclick
 
     };
 
@@ -204,6 +204,7 @@ myApp.onPageInit('mapa', function (page) {
                 optsAstar.startX = origin.x;
                 optsAstar.startY = origin.y;
 
+                // reinicia o grid, mostrando a origem no mapa
                 grid.setOption(optsAstar);
                 grid.initialize();
 
