@@ -233,30 +233,39 @@ myApp.onPageInit('mapa', function (page) {
     });
 
     $$('#popup-destination').on('popup:opened', function () {
-        console.log('popup-destination Popup opened')
-    });
+        console.log('popup-destination Popup opened');
 
-    // Fruits data demo array
-    var fruits = ('Apple Apricot Avocado Banana Melon Orange Peach Pear Pineapple').split(' ');
+        // Fruits data demo array
+        var fruits = ('Apple Apricot Avocado Banana Melon Orange Peach Pear Pineapple').split(' ');
 
-    // Simple Dropdown
-    var autocompleteDropdownSimple = myApp.autocomplete({
-        input: '#autocomplete-dropdown',
-        openIn: 'dropdown',
-        source: function (autocomplete, query, render) {
-            var results = [];
-            if (query.length === 0) {
+        // Simple Dropdown
+        var autocompleteDropdownSimple = myApp.autocomplete({
+            input: '#autocomplete-dropdown',
+            openIn: 'dropdown',
+            source: function (autocomplete, query, render) {
+                var results = [];
+                if (query.length === 0) {
+                    render(results);
+                    return;
+                }
+                // Find matched items
+                for (var i = 0; i < fruits.length; i++) {
+                    if (fruits[i].toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(fruits[i]);
+                }
+                // Render items by passing array with result items
+
+                console.log("passou no autocomplete");
+                console.log(results);
+
                 render(results);
-                return;
             }
-            // Find matched items
-            for (var i = 0; i < fruits.length; i++) {
-                if (fruits[i].toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(fruits[i]);
-            }
-            // Render items by passing array with result items
-            render(results);
-        }
+        });
+
+
+
     });
+
+
 
 })
 
