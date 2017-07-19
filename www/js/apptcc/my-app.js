@@ -18,8 +18,8 @@
  * Created by francisco on 09/07/17.
  */
 
-var appTccServer = "192.168.0.114";
-//var appTccServer = "10.1.0.10";
+//var appTccServer = "192.168.0.114";
+var appTccServer = "10.1.0.10";
 
 
 
@@ -84,7 +84,6 @@ myApp.onPageInit('sobre', function (page) {
 myApp.onPageInit('mapa', function (page) {
     // Do something here for "about" page
     //myApp.alert('Here comes About page');
-
 
     var gridMatrix = [
         1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
@@ -152,16 +151,6 @@ myApp.onPageInit('mapa', function (page) {
 
     var grid = new GraphSearch($grid, optsAstar, astar.search);
 
-
-
-
-
-
-
-
-
-
-
     var origin = {};
     var destination = {};
 
@@ -228,46 +217,83 @@ myApp.onPageInit('mapa', function (page) {
 
     });
 
-    $$('#btnSelectDestination').on('click', function () {
-        myApp.popup('#popup-destination');
-    });
 
-    $$('#popup-destination').on('popup:opened', function () {
-        console.log('popup-destination Popup opened');
-
-        // Fruits data demo array
-        var fruits = ('Apple Apricot Avocado Banana Melon Orange Peach Pear Pineapple').split(' ');
-
-        // Simple Dropdown
-        var autocompleteDropdownSimple = myApp.autocomplete({
-            input: '#autocomplete-dropdown',
-            openIn: 'dropdown',
-            source: function (autocomplete, query, render) {
-                var results = [];
-                if (query.length === 0) {
-                    render(results);
-                    return;
-                }
-                // Find matched items
-                for (var i = 0; i < fruits.length; i++) {
-                    if (fruits[i].toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(fruits[i]);
-                }
-                // Render items by passing array with result items
-
-                console.log("passou no autocomplete");
-                console.log(results);
-
-                render(results);
-            }
-        });
-
-
-
-    });
+    // verifique se ja foi selecionado o destino
+    console.log(page.query);
+    // se o objeto query não vier vazio
+    if(!jQuery.isEmptyObject(page.query)) {
+        var place_id = page.query.place_id;
+        console.log("place_id = "+place_id);
+    }
 
 
 
 })
+
+myApp.onPageInit('destination', function (page) {
+
+
+    var selected_id = null;
+
+
+    var autocompleteDropdownAjax = myApp.autocomplete({
+        input: '#autocomplete-dropdown-ajax',
+        openIn: 'dropdown',
+        preloader: true, //enable preloader
+        valueProperty: 'id', //object's "value" property name
+        textProperty: 'name', //object's "text" property name
+        limit: 20, //limit to 20 results
+        dropdownPlaceholderText: 'Try "JavaScript"',
+        expandInput: true, // expand input
+        source: function (autocomplete, query, render) {
+            var results = [];
+            if (query.length === 0) {
+                render(results);
+                return;
+            }
+            // Show Preloader
+            autocomplete.showPreloader();
+            // Do Ajax request to Autocomplete data
+            $$.ajax({
+                url: 'https://'+appTccServer+'/AppTcc-backend/places/getjsonlist/',
+                //url: 'autocomplete-languages.json',
+                method: 'POST',
+                dataType: 'json',
+                //send "query" to server. Useful in case you generate response dynamically
+                data: {
+                    query: query
+                },
+                success: function (data) {
+
+                    console.log("dados dropdow");
+                    console.log(data);
+
+                    // Find matched items
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].name.toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(data[i]);
+                    }
+                    // Hide Preoloader
+                    autocomplete.hidePreloader();
+                    // Render items by passing array with result items
+                    render(results);
+                }
+            });
+        },
+
+        onChange: function (autocomplete, value) {
+
+            // Add item value to input value
+            $$('#autocomplete-dropdown-ajax').val(value.name);
+            $$('#link_back').attr('href', 'mapa.html?place_id='+value.id);
+
+        }
+
+    });
+
+})
+
+
+
 
 
 

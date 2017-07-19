@@ -86,6 +86,18 @@ myApp.onPageInit('mapa', function (page) {
     //myApp.alert('Here comes About page');
 
 
+
+    console.log(page.query);
+
+    if(page.query != {}) {
+        var place_id = page.query.place_id;
+        console.log("place_id = "+place_id);
+    }
+
+
+
+
+
     var gridMatrix = [
         1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,1,1,1,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
@@ -134,19 +146,19 @@ myApp.onPageInit('mapa', function (page) {
 
     var optsAstar = {
         wallFrequency: .1,
-        gridSizeX: 20,
-        gridSizeY: 20,
-        debug: false,
-        diagonal: true,
+        gridSizeX: 20, // numero colunas do grid
+        gridSizeY: 20, // numero linhas do grid
+        debug: false, // mostrar debug astar
+        diagonal: true, // permiri pesquisa diagonal astar
         closest: false,
-        startX: null, // 10
-        startY: null, // 10
-        endX: null, // 0
-        endY: null, // 0
+        startX: null, // posição X origem. null = não mostra
+        startY: null, // posição Y origem. null = não mostra
+        endX: null, // posição X destino. null = não mostra
+        endY: null, // // posição y destino. null = não mostra
         gridMatrix: gridMatrix,
-        cellSize: 10,
-        initSearch: false,
-        idBtnSearch: "btnStartSearch"
+        cellSize: 10, // tamanho do lado, da célula do grid
+        initSearch: false, // habilita pesquisa
+        idBtnSearch: "btnStartSearch" // id do elemento inicia pesquisa, onclick
 
     };
 
@@ -204,6 +216,7 @@ myApp.onPageInit('mapa', function (page) {
                 optsAstar.startX = origin.x;
                 optsAstar.startY = origin.y;
 
+                // reinicia o grid, mostrando a origem no mapa
                 grid.setOption(optsAstar);
                 grid.initialize();
 
@@ -227,37 +240,79 @@ myApp.onPageInit('mapa', function (page) {
 
     });
 
-    $$('#btnSelectDestination').on('click', function () {
-        myApp.popup('#popup-destination');
-    });
+    // $$('#btnSelectDestination').on('click', function () {
+    //     myApp.popup('#popup-destination');
+    // });
+    //
+    // $$('#popup-destination').on('popup:opened', function () {
+    //     console.log('popup-destination Popup opened');
+    // });
 
-    $$('#popup-destination').on('popup:opened', function () {
-        console.log('popup-destination Popup opened')
-    });
 
-    // Fruits data demo array
-    var fruits = ('Apple Apricot Avocado Banana Melon Orange Peach Pear Pineapple').split(' ');
+})
 
-    // Simple Dropdown
-    var autocompleteDropdownSimple = myApp.autocomplete({
-        input: '#autocomplete-dropdown',
+myApp.onPageInit('destination', function (page) {
+
+
+    var selected_id = null;
+
+
+    var autocompleteDropdownAjax = myApp.autocomplete({
+        input: '#autocomplete-dropdown-ajax',
         openIn: 'dropdown',
+        preloader: true, //enable preloader
+        valueProperty: 'id', //object's "value" property name
+        textProperty: 'name', //object's "text" property name
+        limit: 20, //limit to 20 results
+        dropdownPlaceholderText: 'Try "JavaScript"',
+        expandInput: true, // expand input
         source: function (autocomplete, query, render) {
             var results = [];
             if (query.length === 0) {
                 render(results);
                 return;
             }
-            // Find matched items
-            for (var i = 0; i < fruits.length; i++) {
-                if (fruits[i].toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(fruits[i]);
-            }
-            // Render items by passing array with result items
-            render(results);
+            // Show Preloader
+            autocomplete.showPreloader();
+            // Do Ajax request to Autocomplete data
+            $$.ajax({
+                url: 'autocomplete-languages.json',
+                method: 'GET',
+                dataType: 'json',
+                //send "query" to server. Useful in case you generate response dynamically
+                data: {
+                    query: query
+                },
+                success: function (data) {
+                    // Find matched items
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].name.toLowerCase().indexOf(query.toLowerCase()) >= 0) results.push(data[i]);
+                    }
+                    // Hide Preoloader
+                    autocomplete.hidePreloader();
+                    // Render items by passing array with result items
+                    render(results);
+                }
+            });
+        },
+
+        onChange: function (autocomplete, value) {
+
+            // Add item value to input value
+            $$('#autocomplete-dropdown-ajax').val(value.name);
+
+            $$('#link_back').attr('href', 'mapa.html?place_id='+value.id);
+
+
+
         }
+
     });
 
 })
+
+
+
 
 
 
