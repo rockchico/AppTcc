@@ -1,48 +1,11 @@
-<content src="oflow-master/demo/raw/index.html" />
-<content src="jsfeat-orbdescritor-cam-v1-preliminar-tcc.html" />
-<content src="teste-jsfeat-homography-v2.html" />
-
-
-// UPLOAD IMAGEM ###########################################
-            function win(r) {
-                console.log("Code = " + r.responseCode);
-                console.log("Response = " + r.response);
-                console.log("Sent = " + r.bytesSent);
-            }
-
-            function fail(error) {
-                alert("An error has occurred: Code = " + error.code);
-                console.log("upload error source " + error.source);
-                console.log("upload error target " + error.target);
-            }
-
-            var uri = encodeURI("http://admin:admin@192.168.0.114:9999/api/images");
-
-
-
-
-            var options = new FileUploadOptions();
-            options.fileKey = "file";
-            options.fileName = fileURL.substr(fileURL.lastIndexOf('/')+1);
-            options.mimeType = mimeType;
-
-            var headers={'headerParam':'headerValue'};
-
-            options.headers = headers;
-
-            var params = {};
-            params.keys = "x;y";
-            params.values = "10;11";
-
-            options.params = params;
-
-            var ft = new FileTransfer();
-            //ft.onprogress = function(progressEvent) {
-            //    if (progressEvent.lengthComputable) {
-            //        loadingStatus.setPercentage(progressEvent.loaded / progressEvent.total);
-            //    } else {
-            //        loadingStatus.increment();
-            //    }
-            //};
-            ft.upload(fileURL, uri, win, fail, options);
-            // UPLOAD IMAGEM ###########################################
+#search_grid {
+	background: rgba(0, 0, 255, .25);
+	width: 100%;
+	height: 100%;
+	left: 50%;
+	top: 50%;
+	position: fixed;
+	-webkit-transform: translate(-50%, -50%);
+	transform-origin: center center;
+	transition: transform 400ms;
+}
