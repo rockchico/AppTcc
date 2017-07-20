@@ -23,12 +23,12 @@
 
 #search_grid {
 	background-color: green;
-	width: 360px;
+	width: 500px;
 	height: 100%;
 	white-space: nowrap;
 	position: relative;
 	top: -60px;
-	left: -10px;
+	left: -15px;
 	overflow-x: scroll;
 	overflow-y: hidden;
 	-webkit-overflow-scrolling: touch;

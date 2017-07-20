@@ -85,13 +85,6 @@ myApp.onPageInit('mapa', function (page) {
     // Do something here for "about" page
     //myApp.alert('Here comes About page');
 
-    // configura o lagura do mapa de acordo com a largura da tela
-    //$$('#search_grid').css({
-        //width: '300px',
-    //});
-
-
-
 
     //zoomElement();
 
@@ -169,31 +162,36 @@ myApp.onPageInit('mapa', function (page) {
         optsAstar.endY = destination.y;
     }
 
+    // FALTA FAZER: configurar posição serach grid dinamicamente
+    $(document).ready(function() {
+
+    });
+
+    // executes when HTML-Document is loaded and DOM is ready
+    var windowWidth = $(window).width();
+    var navbarHeight = $('div.navbar').height();
+
+    optsAstar.cellSize = windowWidth / (optsAstar.gridSizeX + 16);
+
+    //console.log("windowWidth");
+    //console.log(windowWidth);
+
+    console.log("navbarHeight");
+    console.log(navbarHeight);
+
+    //var gridWidth = optsAstar.gridSizeX * (optsAstar.cellSize + 2);
+
+    //console.log("gridWidth");
+    //console.log(gridWidth);
+
+
+
 
     var grid = new GraphSearch($grid, optsAstar, astar.search);
 
 
-    // FALTA FAZER: configurar posição serach grid dinamicamente
-    $(document).ready(function() {
-        // executes when HTML-Document is loaded and DOM is ready
-        //var windowWidth = $(window).width();
-        var navbarHeight = $('div.navbar').height();
-
-
-        //console.log("windowWidth");
-        //console.log(windowWidth);
-
-        console.log("navbarHeight");
-        console.log(navbarHeight);
-
-        var gridWidth = optsAstar.gridSizeX * (optsAstar.cellSize + 2);
-
-        console.log("gridWidth");
-        console.log(gridWidth);
-
-        $$('#search_grid').css('width', ''+(gridWidth)+'px');
-        //$$('#search_grid').css('top', ''+(navbarHeight+5)+'px');
-    });
+    $$('#search_grid').css('width', ''+(windowWidth)+'px');
+    //$$('#search_grid').css('top', ''+(navbarHeight+5)+'px');
 
 
 

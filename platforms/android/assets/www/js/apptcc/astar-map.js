@@ -79,14 +79,16 @@ GraphSearch.prototype.initialize = function() {
                     $cell.html(cell_weight);
                 }
 
+
+                // corrige o plano cartesiano do mapa, x = y e y = x
                 if((this.opts.startX != null) && (this.opts.startY != null)) {
-                    if (x == this.opts.startX && y == this.opts.startY) {
+                    if (y == this.opts.startX && x == this.opts.startY) {
                         $cell.addClass(css.start);
                     }
                 }
 
                 if((this.opts.endX != null) && (this.opts.endY != null)) {
-                    if (x == this.opts.endX && y == this.opts.endY) {
+                    if (y == this.opts.endX && x == this.opts.endY) {
                         $cell.addClass(css.finish);
                     }
                 }
