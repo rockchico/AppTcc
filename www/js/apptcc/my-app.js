@@ -19,7 +19,7 @@
  */
 
 //var appTccServer = "192.168.0.114";
-var appTccServer = "10.1.0.10";
+var appTccServer = "10.1.0.3";
 
 
 
@@ -37,8 +37,6 @@ var mainView = myApp.addView('.view-main', {
     // Because we want to use dynamic navbar, we need to enable it for this view:
     dynamicNavbar: true
 });
-
-// Now we need to run the code that will be executed only for About page.
 
 
 // Funções Incialização Página ######################################################################################################
@@ -80,31 +78,35 @@ myApp.onPageInit('sobre', function (page) {
 
 
 
+var origin = {};
+var destination = {};
 
 myApp.onPageInit('mapa', function (page) {
     // Do something here for "about" page
     //myApp.alert('Here comes About page');
 
+    //zoomElement();
+
     var gridMatrix = [
-        1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,1,1,1,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
+        1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
+        1,1,1,1,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
+        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,0,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
+        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,
+        1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,1,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
+        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
+        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,
+        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
+        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,
+        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,0,0,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,1,1,1,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
@@ -113,19 +115,19 @@ myApp.onPageInit('mapa', function (page) {
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,0,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,1,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
+        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,
+        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,
+        1,0,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,
+        1,1,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,
+        1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
+        1,0,1,0,1,1,0,0,0,1,1,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
         1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,0,0,0,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
-        1,0,1,0,1,1,0,0,0,1,1,0,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
+        1,0,1,0,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,
     ];
 
 
@@ -133,8 +135,8 @@ myApp.onPageInit('mapa', function (page) {
 
     var optsAstar = {
         wallFrequency: .1,
-        gridSizeX: 20, // numero colunas do grid
-        gridSizeY: 20, // numero linhas do grid
+        gridSizeX: 40, // numero colunas do grid
+        gridSizeY: 40, // numero linhas do grid
         debug: false, // mostrar debug astar
         diagonal: true, // permiri pesquisa diagonal astar
         closest: false,
@@ -149,10 +151,20 @@ myApp.onPageInit('mapa', function (page) {
 
     };
 
+    if(!jQuery.isEmptyObject(origin)) {
+        optsAstar.startX = origin.x;
+        optsAstar.startY = origin.y;
+    }
+
+    if(!jQuery.isEmptyObject(destination)) {
+        optsAstar.endX = destination.x;
+        optsAstar.endY = destination.y;
+    }
+
+
     var grid = new GraphSearch($grid, optsAstar, astar.search);
 
-    var origin = {};
-    var destination = {};
+
 
 
     function callBackOnUploadSucess (r) {
@@ -190,16 +202,17 @@ myApp.onPageInit('mapa', function (page) {
                 origin.x = obj.jsonResponse.image.place.x;
                 origin.y = obj.jsonResponse.image.place.y;
 
+
+                // reinicia o grid, mostrando a origem no mapa
                 optsAstar.startX = origin.x;
                 optsAstar.startY = origin.y;
 
-                // reinicia o grid, mostrando a origem no mapa
                 grid.setOption(optsAstar);
                 grid.initialize();
 
 
-                console.log("origin");
-                console.log(origin);
+                //console.log("origin");
+                //console.log(origin);
 
             }, function(response) {
                 console.error(response.error);
@@ -210,6 +223,13 @@ myApp.onPageInit('mapa', function (page) {
 
     $$('#btnSelectOrigin').on('click', function () {
 
+        optsAstar.startX = null;
+        optsAstar.startY = null;
+
+        grid.setOption(optsAstar);
+        grid.initialize();
+
+
         var imageCapture = new ImageCapture();
         imageCapture.uri = "http://admin:admin@"+appTccServer+":9999/api/search";
         imageCapture.OnUploadSucess = callBackOnUploadSucess;
@@ -217,14 +237,28 @@ myApp.onPageInit('mapa', function (page) {
 
     });
 
+    $$('#btnStartSearch').on('click', function () {
+
+        if(!jQuery.isEmptyObject(origin) && !jQuery.isEmptyObject(destination)) {
+
+            optsAstar.initSearch = true;
+            grid.setOption(optsAstar);
+            grid.initialize();
+
+
+        }
+
+    });
+
 
     // verifique se ja foi selecionado o destino
-    console.log(page.query);
+    //console.log("page.query");
+    //console.log(page.query);
     // se o objeto query não vier vazio
-    if(!jQuery.isEmptyObject(page.query)) {
-        var place_id = page.query.place_id;
-        console.log("place_id = "+place_id);
-    }
+    //if(!jQuery.isEmptyObject(page.query)) {
+    //    var place_id = page.query.place_id;
+    //    console.log("place_id = "+place_id);
+    //}
 
 
 
@@ -243,7 +277,7 @@ myApp.onPageInit('destination', function (page) {
         valueProperty: 'id', //object's "value" property name
         textProperty: 'name', //object's "text" property name
         limit: 20, //limit to 20 results
-        dropdownPlaceholderText: 'Try "JavaScript"',
+        dropdownPlaceholderText: 'Informe o nome de uma loja, um local ou ponto de interesse',
         expandInput: true, // expand input
         source: function (autocomplete, query, render) {
             var results = [];
@@ -284,7 +318,9 @@ myApp.onPageInit('destination', function (page) {
 
             // Add item value to input value
             $$('#autocomplete-dropdown-ajax').val(value.name);
-            $$('#link_back').attr('href', 'mapa.html?place_id='+value.id);
+
+            destination = value;
+
 
         }
 
@@ -727,3 +763,52 @@ function ImageCapture() {
 
 }
 // ##########################################################################
+
+function zoomElement() {
+    var element = document.querySelector('#element'),
+        book = document.querySelector('#search_grid'),
+        zoomLeveler = document.querySelector('#zoomLeveler'),
+        zoomLevel = 100;
+    var write = function(log) {
+        element.innerHTML = log;
+    };
+    var updateZoomLevel = function(number) {
+        var newzoomLevel = zoomLevel + number;
+        if (newzoomLevel < 10 || newzoomLevel > 200) {
+            return;
+        }
+        zoomLeveler.innerHTML = zoomLevel = newzoomLevel;
+        book.style.transform = 'translate(-50%, -50%) scale(' + zoomLevel / 100 + ')';
+        book.style.webkitTransform = 'translate(-50%, -50%) scale(' + zoomLevel / 100 + ')';
+    };
+    var book = document.querySelector('#search_grid');
+    var bookRegion = new ZingTouch.Region(book);
+    bookRegion.bind(book, 'pinch', function() {
+        write('zoom out');
+        updateZoomLevel(-2);
+    });
+    bookRegion.bind(book, 'expand', function() {
+        write('zoom in');
+        updateZoomLevel(2);
+    });
+    var timer = null;
+    var tap = function() {
+        // double
+        if (timer) {
+            write('zoom in');
+            updateZoomLevel(20);
+            window.clearTimeout(timer);
+            timer = null;
+        }
+        // single
+        else {
+            timer = window.setTimeout(function() {
+                window.clearTimeout(timer);
+                timer = null;
+            }, 300);
+        }
+    }
+    bookRegion.bind(book, 'tap', tap);
+    write('ready');
+    updateZoomLevel(0);
+}
