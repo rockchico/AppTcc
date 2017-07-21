@@ -24,6 +24,9 @@
         },
         "cordova-plugin-http": {
             "PACKAGE_NAME": "com.example.AppTcc"
+        },
+        "cordova-plugin-camera": {
+            "PACKAGE_NAME": "com.example.AppTcc"
         }
     },
     "dependent_plugins": {

@@ -24,6 +24,9 @@
     <feature name="CordovaHttpPlugin">
         <param name="android-package" value="com.synconset.CordovaHttpPlugin" />
     </feature>
+    <feature name="Camera">
+        <param name="android-package" value="org.apache.cordova.camera.CameraLauncher" />
+    </feature>
     <name>AppTcc</name>
     <description>
         A sample Apache Cordova application that responds to the deviceready event.

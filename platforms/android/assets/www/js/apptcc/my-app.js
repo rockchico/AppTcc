@@ -46,30 +46,17 @@ myApp.onPageInit('sobre', function (page) {
     // Do something here for "about" page
     //myApp.alert('Here comes About page');
 
-    $$('p').on('click', function (e) {
-        $$(this).html('sim sim sim');
+
+
+
+
+
+
+    $$('#captura-imagem').on('click', function () {
+
+        capturePhoto();
+
     });
-
-    var uri = encodeURI("http://"+appTccServer+"/AppTcc-backend/places/create");
-
-    cordovaHTTP.post(uri, {
-        name: "teste",
-        x: "10",
-        y: "34"
-    }, {}, function(response) {
-        console.log(response.status);
-        console.log(response);
-
-        //$$('#teste').html(response);
-
-        var obj = parseJSON(response.data);
-
-
-    }, function(response) {
-        console.error(response.error);
-    });
-
-
 
 
 
@@ -469,7 +456,8 @@ myApp.onPageInit('place-images', function (page) {
             var place_id = obj.jsonResponse.place_id;
 
 
-            var imageCapture = new ImageCapture();
+            //var imageCapture = new ImageCapture();
+            var imageCapture = new photoCapture();
             imageCapture.uri = "http://admin:admin@"+appTccServer+":9999/api/images";
             imageCapture.uploadParams = {id: lastInsertId, keys: "place_id", values: ""+place_id+""}
 
@@ -791,6 +779,134 @@ function ImageCapture() {
     // fim upload ###########################################################################################
 
 }
+
+
+
+
+// objeto usando o plugin cordova-camera
+
+function photoCapture() {
+
+    this.uri = "";
+    this.fileURL = "";
+    this.uploadParams = {};
+
+    this.pictureSource = ""; // picture source
+    this.destinationType = ""; // sets the format of returned value
+
+    var self = this;
+
+    this.doCapture = function () {
+        document.addEventListener("deviceready", this.onDeviceReady, false);
+
+        self.capturePhoto();
+    }
+
+
+
+// Wait for device API libraries to load
+//
+
+// device APIs are available
+//
+
+    this.onDeviceReady = function() {
+        this.destinationType = navigator.camera.DestinationType;
+    }
+// Called when a photo is successfully retrieved
+//
+
+    this.onPhotoDataSuccess = function(imageURI) {
+        this.fileURL = imageURI;
+
+        self.doUpload();
+    }
+
+// A button will call this function
+//
+
+    this.capturePhoto = function() {
+        // Take picture using device camera and retrieve image as base64-encoded string
+        navigator.camera.getPicture(this.onPhotoDataSuccess, this.onFail, {
+            quality: 30,
+            targetWidth: 1024,
+            targetHeight: 768,
+            destinationType: this.destinationType.FILE_URI,
+            saveToPhotoAlbum: true
+        });
+    }
+
+//
+
+    function onFail(message) {
+        alert('Failed because: ' + message);
+    }
+
+
+    // upload ###########################################################################################
+    this.OnUploadSucess = function (r) {
+        console.log("Code = " + r.responseCode);
+        console.log("Response = " + r.response);
+        console.log("Sent = " + r.bytesSent);
+
+        uploadResponse = r;
+
+        //alert("Imagem enviada com sucesso!");
+
+
+    }
+
+    this.OnUploadFail = function (error) {
+        alert("An error has occurred: Code = " + error.code);
+        console.log("upload error source " + error.source);
+        console.log("upload error target " + error.target);
+    }
+
+
+    this.getUploadResponse = function() {
+        return uploadResponse;
+    }
+
+
+
+
+    this.doUpload = function () {
+
+
+        var options = new FileUploadOptions();
+        options.fileKey = "file";
+        options.fileName = this.fileURL.substr(this.fileURL.lastIndexOf('/')+1);
+        //options.mimeType = this.mimeType;
+
+        //var headers={'headerParam':'headerValue'};
+
+        //options.headers = headers;
+
+        options.params = this.uploadParams;
+
+        var ft = new FileTransfer();
+        //ft.onprogress = function(progressEvent) {
+        //    if (progressEvent.lengthComputable) {
+        //        loadingStatus.setPercentage(progressEvent.loaded / progressEvent.total);
+        //    } else {
+        //        loadingStatus.increment();
+        //    }
+        //};
+        ft.upload(fileURL, encodeURI(this.uri), this.OnUploadSucess, this.OnUploadFail, options);
+    }
+    // fim upload ###########################################################################################
+
+
+
+
+
+
+}
+
+
+
+
+
 // ##########################################################################
 
 function zoomElement() {
