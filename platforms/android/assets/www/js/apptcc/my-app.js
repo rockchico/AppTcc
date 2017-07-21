@@ -68,7 +68,7 @@ myApp.onPageInit('sobre', function (page) {
 var origin = {};
 var destination = {};
 
-myApp.onPageInit('mapa', function (page) {
+myApp.onPageInit('map', function (page) {
     // Do something here for "about" page
     //myApp.alert('Here comes About page');
 
@@ -285,7 +285,6 @@ myApp.onPageInit('destination', function (page) {
 
     var selected_id = null;
 
-
     var autocompleteDropdownAjax = myApp.autocomplete({
         input: '#autocomplete-dropdown-ajax',
         openIn: 'dropdown',
@@ -341,6 +340,18 @@ myApp.onPageInit('destination', function (page) {
         }
 
     });
+
+    // botão seleção destino, verifica se o usuário realmente selecioneu algum destino
+    $$('#btnSelectDestination').on('click', function (e) {
+
+        if(jQuery.isEmptyObject(destination)) {
+            myApp.alert("Selecione o destino", "Aviso!");
+        } else {
+            mainView.router.loadPage("map.html");
+        }
+
+    });
+
 
 })
 
@@ -410,6 +421,8 @@ myApp.onPageInit('places', function (page) {
     });
 })
 
+
+
 myApp.onPageInit('place-images', function (page) {
     // Do something here for "about" page
     //myApp.alert('Here comes About page');
@@ -456,8 +469,7 @@ myApp.onPageInit('place-images', function (page) {
             var place_id = obj.jsonResponse.place_id;
 
 
-            //var imageCapture = new ImageCapture();
-            var imageCapture = new photoCapture();
+            var imageCapture = new ImageCapture();
             imageCapture.uri = "http://admin:admin@"+appTccServer+":9999/api/images";
             imageCapture.uploadParams = {id: lastInsertId, keys: "place_id", values: ""+place_id+""}
 
@@ -472,18 +484,24 @@ myApp.onPageInit('place-images', function (page) {
 
     });
 
-    $$('#btnDeleteImageAction').on('click', function (e) {
-        console.log("btnDeleteImageAction resource"+this.resource);
-    });
+    // $$('#btnDeleteImageAction').on('click', function (e) {
+    //     // recarrega a lista de imagens mostrando a imagem inserida
+    //     // https://framework7.io/docs/router-api.html
+    //
+    //     console.log("passou aqui , btnDeleteImageAction");
+    //
+    //
+    // });
+
+
 
 
 })
 // Fim Funções Incialização Página ######################################################################################################
 
 // Ações botões #####################################################
+function deleteImage(id) {
 
-// botão "excluir" na página place-images.html
-function btnDeleteImageAction(id) {
 
     console.log("btnDeleteImageAction "+id);
 
@@ -525,16 +543,10 @@ function btnDeleteImageAction(id) {
 
                 //$$('#teste').html(response);
 
-                var obj = parseJSON(response.data);
+                //var obj = parseJSON(response.data);
 
-                // recarrega a lista de imagens mostrando a imagem inserida
-                // https://framework7.io/docs/router-api.html
-                var options = {};
-                options.pageName = "place-images";
-                options.query = {place_id: "1"};
-                mainView.router.load(options);
-
-
+                // recarrega a página após a exclusão
+                mainView.router.refreshPage()
 
             }, function(response) {
                 console.error(response.error);
@@ -556,6 +568,32 @@ function btnDeleteImageAction(id) {
 
 
 }
+// botão "excluir" na página place-images.html
+function btnDeleteImageAction(id) {
+
+
+    var buttons = [
+        {
+            text: 'Excluir a imagem?',
+            label: true
+        },
+        {
+            text: 'Sim',
+            onClick: function () {
+                //myApp.alert('Button1 clicked');
+                deleteImage(id);
+            }
+        },
+        {
+            text: 'Não',
+            onClick: function () {
+                //myApp.alert('Button2 clicked');
+            }
+        },
+    ];
+    myApp.actions(buttons);
+
+}
 
 
 
@@ -575,7 +613,7 @@ function htmlImageList(obj) {
                 '<div class="item-media"><img src="http://'+appTccServer+':9999/thumb/'+images[i].id+'.png?size=128" width="128"></div>' +
                 '<div class="item-inner">' +
                     '<div class="item-title">' +
-                        '<a id="btnDeleteImage" onclick="btnDeleteImageAction('+images[i].id+')" href="#" class="button buttons-row button-fill color-red" resource="'+images[i].id+'">EXCLUIR</a>' +
+                        '<a id="btnDeleteImage" onclick="btnDeleteImageAction('+images[i].id+')" rel="'+images[i].id+'" href="#" class="button buttons-row button-fill color-red" resource="'+images[i].id+'">EXCLUIR</a>' +
                     '</div>' +
                     '<div class="item-subtitle">'+images[i].id+'</div>' +
                 '</div>'+
@@ -584,7 +622,7 @@ function htmlImageList(obj) {
 
     listHTML += '</ul>';
 
-    $$('#apptcc-imagelist').html(listHTML);
+    $$('#apptcc-imagelist').append(listHTML);
 
 }
 
@@ -677,231 +715,7 @@ $$(document).on('pageInit', '.page[data-page="about"]', function (e) {
 *
 * */
 
-function ImageCapture() {
 
-    //var uri = encodeURI("http://10.1.0.10/AppTcc-backend/images/create");
-    this.uri = "";
-
-    this.imageCaptured = "";
-    this.fileURL = "";
-    this.mimeType = "";
-
-    var uploadResponse = {} // variável privada
-
-    this.uploadParams = {};
-
-
-    //console.log(navigator.device.capture);
-
-
-    this.optionsCapture = {
-        limit: 1
-    }
-
-    // captura imagem ################################################################################################
-    this.doCapture = function () {
-        navigator.device.capture.captureImage(this.OnCatureSucess, this.onCaptureError, this.optionsCapture);
-    }
-
-    var self = this;
-
-
-    this.OnCatureSucess = function (mediaFiles) {
-        var i, path, len;
-        for (i = 0, len = mediaFiles.length; i < len; i += 1) {
-            path = mediaFiles[i].fullPath;
-            console.log(mediaFiles);
-            this.imageCaptured = mediaFiles;
-            this.fileURL = this.imageCaptured[0].localURL;
-            this.mimeType = this.imageCaptured[0].type;
-
-
-            self.doUpload();
-        }
-    }
-
-    this.onCaptureError = function (error) {
-        navigator.notification.alert('Error code: ' + error.code, null, 'Capture Error');
-    }
-    // fim captura imagem ################################################################################################
-
-    // upload ###########################################################################################
-    this.OnUploadSucess = function (r) {
-        console.log("Code = " + r.responseCode);
-        console.log("Response = " + r.response);
-        console.log("Sent = " + r.bytesSent);
-
-        uploadResponse = r;
-
-        //alert("Imagem enviada com sucesso!");
-
-
-    }
-
-    this.OnUploadFail = function (error) {
-        alert("An error has occurred: Code = " + error.code);
-        console.log("upload error source " + error.source);
-        console.log("upload error target " + error.target);
-    }
-
-
-    this.getUploadResponse = function() {
-        return uploadResponse;
-    }
-
-
-
-
-    this.doUpload = function () {
-
-
-        var options = new FileUploadOptions();
-        options.fileKey = "file";
-        options.fileName = this.fileURL.substr(this.fileURL.lastIndexOf('/')+1);
-        options.mimeType = this.mimeType;
-
-        //var headers={'headerParam':'headerValue'};
-
-        //options.headers = headers;
-
-        options.params = this.uploadParams;
-
-        var ft = new FileTransfer();
-        //ft.onprogress = function(progressEvent) {
-        //    if (progressEvent.lengthComputable) {
-        //        loadingStatus.setPercentage(progressEvent.loaded / progressEvent.total);
-        //    } else {
-        //        loadingStatus.increment();
-        //    }
-        //};
-        ft.upload(fileURL, encodeURI(this.uri), this.OnUploadSucess, this.OnUploadFail, options);
-    }
-    // fim upload ###########################################################################################
-
-}
-
-
-
-
-// objeto usando o plugin cordova-camera
-
-function photoCapture() {
-
-    this.uri = "";
-    this.fileURL = "";
-    this.uploadParams = {};
-
-    this.pictureSource = ""; // picture source
-    this.destinationType = ""; // sets the format of returned value
-
-    var self = this;
-
-    this.doCapture = function () {
-        document.addEventListener("deviceready", this.onDeviceReady, false);
-
-        self.capturePhoto();
-    }
-
-
-
-// Wait for device API libraries to load
-//
-
-// device APIs are available
-//
-
-    this.onDeviceReady = function() {
-        this.destinationType = navigator.camera.DestinationType;
-    }
-// Called when a photo is successfully retrieved
-//
-
-    this.onPhotoDataSuccess = function(imageURI) {
-        this.fileURL = imageURI;
-
-        self.doUpload();
-    }
-
-// A button will call this function
-//
-
-    this.capturePhoto = function() {
-        // Take picture using device camera and retrieve image as base64-encoded string
-        navigator.camera.getPicture(this.onPhotoDataSuccess, this.onFail, {
-            quality: 30,
-            targetWidth: 1024,
-            targetHeight: 768,
-            destinationType: this.destinationType.FILE_URI,
-            saveToPhotoAlbum: true
-        });
-    }
-
-//
-
-    function onFail(message) {
-        alert('Failed because: ' + message);
-    }
-
-
-    // upload ###########################################################################################
-    this.OnUploadSucess = function (r) {
-        console.log("Code = " + r.responseCode);
-        console.log("Response = " + r.response);
-        console.log("Sent = " + r.bytesSent);
-
-        uploadResponse = r;
-
-        //alert("Imagem enviada com sucesso!");
-
-
-    }
-
-    this.OnUploadFail = function (error) {
-        alert("An error has occurred: Code = " + error.code);
-        console.log("upload error source " + error.source);
-        console.log("upload error target " + error.target);
-    }
-
-
-    this.getUploadResponse = function() {
-        return uploadResponse;
-    }
-
-
-
-
-    this.doUpload = function () {
-
-
-        var options = new FileUploadOptions();
-        options.fileKey = "file";
-        options.fileName = this.fileURL.substr(this.fileURL.lastIndexOf('/')+1);
-        //options.mimeType = this.mimeType;
-
-        //var headers={'headerParam':'headerValue'};
-
-        //options.headers = headers;
-
-        options.params = this.uploadParams;
-
-        var ft = new FileTransfer();
-        //ft.onprogress = function(progressEvent) {
-        //    if (progressEvent.lengthComputable) {
-        //        loadingStatus.setPercentage(progressEvent.loaded / progressEvent.total);
-        //    } else {
-        //        loadingStatus.increment();
-        //    }
-        //};
-        ft.upload(fileURL, encodeURI(this.uri), this.OnUploadSucess, this.OnUploadFail, options);
-    }
-    // fim upload ###########################################################################################
-
-
-
-
-
-
-}
 
 
 
