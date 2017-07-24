@@ -23,12 +23,12 @@
 
 #search_grid {
 	background-color: green;
-	width: 500px;
+	/*width: 500px;*/
 	height: 100%;
 	white-space: nowrap;
 	position: relative;
-	top: -60px;
-	left: -15px;
+	top: -40px;
+	left: 0px;
 	overflow-x: scroll;
 	overflow-y: hidden;
 	-webkit-overflow-scrolling: touch;
@@ -44,10 +44,11 @@
 
 .grid_item {
 	display: block;
-	border: 1px solid #fafafa;
+	/*border: 1px solid #fafafa;*/
+	border: 0;
 	float: left;
-	line-height:12px;
-	font-size:10px;
+	/*line-height:12px;*/
+	/*font-size:10px;*/
 }
 .grid_item.wall {
   background-color: #000000;
