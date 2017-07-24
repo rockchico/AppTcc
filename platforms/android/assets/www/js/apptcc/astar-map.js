@@ -47,7 +47,7 @@ GraphSearch.prototype.initialize = function() {
 
     var gridIndex = 0;
 
-    for(var x = 0; x < this.opts.gridSizeX; x++) {
+    for(var x = 0; x < this.opts.gridSizeY; x++) {
         var $row = $("<div class='clear' />"),
             nodeRow = [],
             gridRow = [];
