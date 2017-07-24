@@ -124,7 +124,7 @@ myApp.onPageInit('map', function (page) {
     var optsAstar = {
         wallFrequency: .1,
         gridSizeX: 100, // numero colunas do grid
-        gridSizeY: 117, // numero linhas do grid
+        gridSizeY: 127, // numero linhas do grid
         debug: false, // mostrar debug astar
         diagonal: true, // permiri pesquisa diagonal astar
         closest: false,
@@ -178,8 +178,8 @@ myApp.onPageInit('map', function (page) {
 
 
     $$('#search_grid').css('width', ''+(pageWidth)+'px');
-    //$$('#search_grid').css('height', ''+(pageHeight)+'px');
-    //$$('#search_grid').css('top', '-40px');
+    $$('#search_grid').css('height', ''+(300)+'px');
+    $$('#search_grid').css('top', ''+(navbarHeight)+'px');
     //$$('#search_grid').css('top', ''+(navbarHeight+5)+'px');
 
 

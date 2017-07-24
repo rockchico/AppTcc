@@ -26,7 +26,7 @@
 	/*width: 500px;*/
 	height: 100%;
 	white-space: nowrap;
-	position: relative;
+	position: absolute;
 	top: -40px;
 	left: 0px;
 	overflow-x: scroll;
