@@ -120,8 +120,8 @@ myApp.onPageInit('map', function (page) {
     //console.log("windowWidth");
     //console.log(windowWidth);
 
-    console.log("navbarHeight");
-    console.log(navbarHeight);
+    //console.log("navbarHeight");
+    //console.log(navbarHeight);
 
     //var gridWidth = optsAstar.gridSizeX * (optsAstar.cellSize + 2);
 
@@ -136,7 +136,7 @@ myApp.onPageInit('map', function (page) {
 
     $$('#search_grid').css('width', ''+(pageWidth)+'px');
     $$('#search_grid').css('height', ''+(pageHeight)+'px');
-    $$('#search_grid').css('top', ''+(navbarHeight)+'px');
+    //$$('#search_grid').css('top', ''+(navbarHeight)+'px');
     //$$('#search_grid').css('top', ''+(navbarHeight+5)+'px');
 
 
