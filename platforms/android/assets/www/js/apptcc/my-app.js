@@ -19,8 +19,8 @@
  */
 
 //var appTccServer = "192.168.0.114";
-//var appTccServer = "10.1.0.3";
-var appTccServer = "ec2-13-58-57-157.us-east-2.compute.amazonaws.com";
+var appTccServer = "10.1.0.3";
+//var appTccServer = "ec2-13-58-57-157.us-east-2.compute.amazonaws.com";
 
 
 
