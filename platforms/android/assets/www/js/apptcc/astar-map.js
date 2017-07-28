@@ -122,8 +122,6 @@ GraphSearch.prototype.initialize = function() {
     }
 
 
-
-
 };
 GraphSearch.prototype.initSearch = function($end) {
 

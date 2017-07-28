@@ -120,8 +120,8 @@ myApp.onPageInit('map', function (page) {
     //console.log("windowWidth");
     //console.log(windowWidth);
 
-    console.log("navbarHeight");
-    console.log(navbarHeight);
+    //console.log("navbarHeight");
+    //console.log(navbarHeight);
 
     //var gridWidth = optsAstar.gridSizeX * (optsAstar.cellSize + 2);
 
@@ -136,7 +136,7 @@ myApp.onPageInit('map', function (page) {
 
     $$('#search_grid').css('width', ''+(pageWidth)+'px');
     $$('#search_grid').css('height', ''+(pageHeight)+'px');
-    $$('#search_grid').css('top', ''+(navbarHeight)+'px');
+    //$$('#search_grid').css('top', ''+(navbarHeight)+'px');
     //$$('#search_grid').css('top', ''+(navbarHeight+5)+'px');
 
 
@@ -221,7 +221,20 @@ myApp.onPageInit('map', function (page) {
             grid.initialize();
 
 
+        } else if (jQuery.isEmptyObject(origin) && !jQuery.isEmptyObject(destination)) {
+
+            myApp.alert('Selecione a origem', 'Aviso!');
+
+        } else if (jQuery.isEmptyObject(destination) && !jQuery.isEmptyObject(origin)) {
+
+            myApp.alert('Selecione o destino', 'Aviso!');
+
+        } else {
+
+            myApp.alert('Selecione a origem e o destino', 'Aviso!');
+
         }
+
 
     });
 
@@ -251,7 +264,7 @@ myApp.onPageInit('destination', function (page) {
         valueProperty: 'id', //object's "value" property name
         textProperty: 'name', //object's "text" property name
         limit: 20, //limit to 20 results
-        dropdownPlaceholderText: 'Informe o nome de uma loja, um local ou ponto de interesse',
+        //dropdownPlaceholderText: 'Informe o nome de uma loja, um local ou ponto de interesse',
         expandInput: true, // expand input
         source: function (autocomplete, query, render) {
             var results = [];
@@ -600,24 +613,42 @@ function htmlPlacesList(obj) {
 
     var places = obj.jsonResponse.places;
 
-    var listHTML = '<ul>';
+    // var listHTML = '<ul>';
+    //
+    // for(var i = 0;i < places.length; i++) {
+    //
+    //
+    //     listHTML += '<li>' +
+    //         '<a href="place-images.html?place_id='+places[i].id+'" class="item-link item-content">' +
+    //         '<div class="item-inner">' +
+    //         '<div class="item-title-row">' +
+    //         '<div class="item-title">'+places[i].name+'</div>' +
+    //         '</div>' +
+    //         '<div class="item-subtitle">cord x: '+places[i].x+' cord y: '+places[i].y+'</div>' +
+    //         '</div>'+
+    //         '</a>'+
+    //         '</li>';
+    // }
+    //
+    // listHTML += '</ul>';
+
+    var listHTML = '';
 
     for(var i = 0;i < places.length; i++) {
 
+        listHTML += '' +
+        '<div class="card">' +
+        '<div class="card-header"><a href="place-images.html?place_id='+places[i].id+'" class="item-link item-content color-blue">'+places[i].name+'</a></div>' +
+        '<div class="card-content">' +
+            '<div class="card-content-inner">Info lugar</div>' +
+        '</div>' +
+        '<div class="card-footer">Card Footer</div>' +
+        '</div>';
 
-        listHTML += '<li>' +
-            '<a href="place-images.html?place_id='+places[i].id+'" class="item-link item-content">' +
-            '<div class="item-inner">' +
-            '<div class="item-title-row">' +
-            '<div class="item-title">'+places[i].name+'</div>' +
-            '</div>' +
-            '<div class="item-subtitle">cord x: '+places[i].x+' cord y: '+places[i].y+'</div>' +
-            '</div>'+
-            '</a>'+
-            '</li>';
+
     }
 
-    listHTML += '</ul>';
+
 
     $$('#apptcc-places-list').html(listHTML);
 
