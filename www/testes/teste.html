@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+
+    var maxElements = 5;
+    var elementCount = 0;
+
+
+    var measuredValuesArray = [];
+
+
+    function addValue(value) {
+
+        // The push() method adds new items to the end of an array, and returns the new length.
+        if(elementCount < maxElements) {
+            measuredValuesArray.push(value);
+            elementCount ++;
+        } else {
+            measuredValuesArray.shift();
+            measuredValuesArray.push(value);
+        }
+
+    }
+
+
+
+    addValue(4);
+    addValue(9);
+    addValue(1);
+    addValue(0);
+    addValue(5);
+    addValue(10);
+    addValue(33);
+    console.log(measuredValuesArray);
+
+
+
+</script>
+
+
+</body>
+</html>
