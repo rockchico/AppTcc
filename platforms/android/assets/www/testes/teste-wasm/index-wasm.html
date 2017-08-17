@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>OpenCV.js Video Processing (WebAssembly)</title>
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    #webcam {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    #canvas {
+      left: 0;
+      top: 480px;
+      position: absolute;
+    }
+
+    #canvas2 {
+      left: 0;
+      top: 0;
+      position: absolute;
+    }
+  </style>
+
+
+
+</head>
+<body>
+<div id="info" class="text-center">
+  OpenCV.js is loading...
+</div>
+<div id="container" class="invisible">
+  <div class="invisible">
+    <video id="video" class="hidden">Your browser does not support the video tag.</video>
+  </div>
+  <canvas id="canvas" width="640" height="480"></canvas>
+</div>
+
+
+
+<script src="adapter-latest.js"></script>
+<script src="stats.min.js"></script>
+<script src="dat.gui.min.js"></script>
+<script src="utils.js"></script>
+<script>
+var featuresReady = checkFeatures(document.getElementById("info"), {webrtc: true, wasm: true});
+</script>
+<script src="index.js"></script>
+<script>
+var Module = {
+  //wasmBinaryFile: '../build/wasm/opencv_js.wasm',
+    wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/opencvjs/build/wasm/opencv_js.wasm',
+
+
+  _main: function() {opencvIsReady();}
+};
+</script>
+<script src='color_cycle_asm.js'></script>
+</body>
+</html>

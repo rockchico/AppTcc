@@ -1,0 +1,243 @@
+
+<!doctype html>
+
+<html lang="en">
+<head>
+
+    <title>TESTE WASM</title>
+
+    <style>
+        #webcam {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        #canvas {
+            left: 0;
+            top: 480px;
+            position: absolute;
+        }
+
+        #canvas2 {
+            left: 0;
+            top: 0;
+            position: absolute;
+        }
+    </style>
+
+
+</head>
+<body>
+<video id="webcam" width="640" height="480" style="display:none;"></video>
+<div style=" width:640px;height:480px;margin: 10px auto;">
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <canvas id="canvas2" width="640" height="480"></canvas>
+    <div id="no_rtc" class="alert alert-error" style="display:none;"></div>
+    <div id="log" class="alert alert-info"></div>
+</div>
+
+<script type="text/javascript">
+
+
+
+</script>
+
+
+
+<script type="text/javascript" src="jquery.min.js"></script>
+<script type="text/javascript" src="compatibility.js"></script>
+<script type="text/javascript" src="profiler.js"></script>
+
+
+
+<script type="text/javascript">
+
+
+    //    wasmBinaryFile='https://192.168.99.10/AppTcc/www/testes/teste-wasm/color_cycle_asm.wasm';
+    // https://10.1.0.3/AppTcc/www/testes/teste-wasm/color_cycle_asm.wasm
+
+
+    var Module = {
+        //wasmBinaryFile: '../build/wasm/opencv_js.wasm',
+        wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/teste-wasm/color_cycle_asm.wasm',
+
+
+        //_main: function() {opencvIsReady();}
+
+        //_main: function() {makeFrameProcessor();}
+
+
+
+    };
+
+
+
+</script>
+
+<script src='color_cycle_asm.js'></script>
+
+
+<script type="text/javascript">
+
+    var stat = new profiler();
+
+    // lets do some fun
+    var video = document.getElementById('webcam');
+    var canvas = document.getElementById('canvas');
+    var canvas2 = document.getElementById('canvas2');
+
+    var ctx = canvas.getContext('2d');
+    var ctx2 = canvas2.getContext('2d');
+
+    try {
+
+        var teste123 = {video: {
+            //facingMode: {exact: "environment"},
+            //deviceId: {exact: "e6cb32e3da6356f1c650fd7136b2cbfa6f1a76950a69326baab56b6f8da3c346"},
+            width: {exact: 640},
+            height: {exact: 480}
+        }};
+
+        compatibility.getUserMedia(teste123, function(stream) {
+            try {
+                video.src = compatibility.URL.createObjectURL(stream);
+            } catch (error) {
+                video.src = stream;
+            }
+            setTimeout(function() {
+                video.play();
+            }, 500);
+        }, function (error) {
+            $('#canvas').hide();
+            $('#log').hide();
+            $('#no_rtc').html('<h4>WebRTC not available.</h4>');
+            $('#no_rtc').show();
+        });
+    } catch (error) {
+        $('#canvas').hide();
+        $('#log').hide();
+        $('#no_rtc').html('<h4>Something goes wrong...</h4>');
+        $('#no_rtc').show();
+    }
+    
+
+
+    makeFrameProcessor();
+
+
+    function addVideoElements() {
+
+        return { video: video, canvas: canvas };
+    }
+
+    function makeFrameProcessor() {
+
+        var fp = addVideoElements();
+
+        // Somewhat based on http://www.kaizou.org/2012/09/frame-by-frame-video-effects-using-html5-and/
+        fp.viewport = fp.canvas.getContext("2d");
+        fp.width = fp.canvas.width;
+        fp.height = fp.canvas.height;
+        // Create the frame-buffer canvas
+        fp.framebuffer = document.createElement("canvas");
+        fp.framebuffer.width = fp.width;
+        fp.framebuffer.height = fp.height;
+        fp.ctx = fp.framebuffer.getContext("2d");
+
+        // Start rendering when the video is playing
+        fp.playHandler = function () {
+            // check if video frames are ready, if not try again a bit later.
+            if (0 == fp.video.videoWidth || 0 == fp.video.videoHeight) {
+                setTimeout(fp.playHandler, 10);
+                return;
+            }
+
+            fp.canvas.width = fp.video.videoWidth;
+            fp.canvas.height = fp.video.videoHeight;
+            fp.width = fp.canvas.width;
+            fp.height = fp.canvas.height;
+            fp.framebuffer.width = fp.width;
+            fp.framebuffer.height = fp.height;
+            fp.render();
+        }
+        fp.video.addEventListener("play", fp.playHandler, false);
+
+        fp.color_change_speed = 10;
+
+        function _freeArray(heapBytes) {
+            Module._free(heapBytes.byteOffset);
+        }
+
+        function _arrayToHeap(typedArray) {
+            var numBytes = typedArray.length * typedArray.BYTES_PER_ELEMENT;
+            var ptr = Module._malloc(numBytes);
+            var heapBytes = Module.HEAPU8.subarray(ptr, ptr + numBytes);
+            heapBytes.set(typedArray);
+            return heapBytes;
+        }
+
+        // Compute and display the next frame
+        fp.renderFrame = function () {
+            // Acquire a video frame from the video element
+            fp.ctx.drawImage(fp.video, 0, 0, fp.video.videoWidth,
+                fp.video.videoHeight, 0, 0, fp.width, fp.height);
+            var img_data = fp.ctx.getImageData(0, 0, fp.width, fp.height);
+
+            if (!fp.frame_bytes) {
+                fp.frame_bytes = _arrayToHeap(img_data.data);
+            }
+            else if (fp.frame_bytes.length !== img_data.data.length) {
+                _freeArray(fp.frame_bytes); // free heap memory
+                fp.frame_bytes = _arrayToHeap(img_data.data);
+            }
+            else {
+                fp.frame_bytes.set(img_data.data);
+            }
+
+            // Perform operation on copy, no additional conversions needed, direct pointer manipulation
+            // results will be put directly into the output param.
+
+            //stat.start("rotate_color");
+            Module._rotate_colors(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, fp.color_change_speed);
+            //stat.stop("rotate_color");
+
+
+
+
+
+            //Module._teste_soma(3 ,6);
+            //Module._teste_blur(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, fp.color_change_speed);
+            //Module._teste_gray(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, fp.color_change_speed);
+            // copy output to ImageData
+            img_data.data.set(fp.frame_bytes);
+            // Render to viewport
+            fp.viewport.putImageData(img_data, 0, 0);
+        };
+
+        // Rendering call-back
+        fp.render = function () {
+            if (fp.video.paused || fp.video.ended) {
+                return;
+            }
+            fp.renderFrame();
+            var self = fp;
+            requestAnimationFrame(self.render);
+        };
+
+        // Some platforms seem to disable autoplay
+        // so wait a moment and display the controls and call play() manually
+        setTimeout(function() {
+            var isPlaying = 0 < fp.video.currentTime && !fp.video.paused && !fp.video.ended && 2 < fp.video.readyState;
+            if (!isPlaying) {
+                fp.video.controls = true;
+                fp.video.play();
+            }
+        }, 200);
+
+        return fp;
+    };
+</script>
+
+</body>
+</html>
