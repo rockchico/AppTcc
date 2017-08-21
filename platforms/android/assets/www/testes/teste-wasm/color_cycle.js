@@ -87,17 +87,7 @@ function makeFrameProcessor(videoName) {
 
       // Perform operation on copy, no additional conversions needed, direct pointer manipulation
       // results will be put directly into the output param.
-
-       Module._rotate_colors(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, fp.color_change_speed);
-
-
-
-
-
-
-           //Module._teste_soma(3 ,6);
-      //Module._teste_blur(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, fp.color_change_speed);
-      //Module._teste_gray(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, fp.color_change_speed);
+      Module._rotate_colors(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, fp.color_change_speed);
       // copy output to ImageData
       img_data.data.set(fp.frame_bytes);
       // Render to viewport
