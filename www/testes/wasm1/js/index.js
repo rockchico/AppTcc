@@ -64,8 +64,6 @@ function passThrough(src) {
 
 function gray(src) {
   cv.cvtColor(src, dstC1, cv.COLOR_RGBA2GRAY);
-
-
   return dstC1;
 }
 

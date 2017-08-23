@@ -141,7 +141,7 @@
                 ctx2.drawImage(video, 0, 0, 640, 480);
                 //var imageData = ctx.getImageData(0, 0, 640, 480);
 
-                console.log(stat.log());
+                //console.log(stat.log());
 
 
             }
@@ -155,6 +155,9 @@
 
             return { video: video, canvas: canvas };
         }
+
+
+        var indexFrame = 0;
 
         function makeFrameProcessor() {
 
@@ -224,13 +227,19 @@
                 // results will be put directly into the output param.
 
 
-                Module._rotate_colors(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, fp.color_change_speed);
+                //Module._rotate_colors(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, fp.color_change_speed);
 
 
                 //Module._teste_soma(3 ,6);
                 //Module._teste_blur(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, fp.color_change_speed);
-                //Module._teste_gray(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, fp.color_change_speed);
+                //Module._teste_gray(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, indexFrame);
 
+                Module._teste_features(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, indexFrame);
+                
+
+
+
+                indexFrame++;
 
                 // copy output to ImageData
                 img_data.data.set(fp.frame_bytes);
