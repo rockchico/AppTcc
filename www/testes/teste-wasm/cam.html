@@ -77,8 +77,7 @@
                 }
             };
             var onDimensionsReady = function(width, height) {
-                makeFrameProcessor();
-                compatibility.requestAnimationFrame(tick);
+                compatibility.requestAnimationFrame(makeFrameProcessor);
             };
 
             video.addEventListener('loadeddata', readyListener);
