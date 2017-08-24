@@ -1,0 +1,41 @@
+
+# exibição do mapa
+https://stackoverflow.com/questions/25313186/how-can-i-make-a-div-scroll-horizontally
+
+<style>
+.outer {
+    width: 500px;
+    height: 100px;
+    white-space: nowrap;
+    position: relative;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.outer div {
+    width: 24.5%;
+    background-color: #eee;
+    float: none;
+    height: 90%;
+    margin: 0 0.25%;
+    display: inline-block;
+    zoom: 1;
+}
+</style>
+
+<div class="outer">
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+</div>
+
+# zoom no mapa
+
+https://gist.github.com/iwazaru/058b4dfad18d37d751d46884b261c967

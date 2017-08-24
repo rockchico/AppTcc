@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>chapter 1, matrix to gray</title>
+    <script src="../js/jquery.min.js"></script>
+    <script src="../js/jsfeat-min.js"></script>
+    <script src="../js/common-jsfeat.js"></script>
+    <link rel="stylesheet" type="text/css" href="../css/cvw.css">
+</head>
+<body>
+
+<div id="grid_matrix">
+
+</div>
+
+<div id="images" class="canvas-parent">
+    <canvas id="initCanvas" class="canvas-img"></canvas>
+</div>
+
+
+
+<script>
+    var canvas = document.getElementById('initCanvas'),
+            context = canvas.getContext('2d'),
+            image = new Image();
+    image.src = '../img/planta2.png';
+
+    image.onload = function () {
+        var cols = image.width;
+        var rows = image.height;
+        canvas.width = cols;
+        canvas.height = rows;
+        context.drawImage(image, 0, 0, image.width, image.height, 0, 0, cols, rows);
+
+        var imageData = context.getImageData(0, 0, cols, rows);
+        var dataBuffer = new jsfeat.data_t(cols * rows, imageData.data.buffer);
+        var mat = new jsfeat.matrix_t(cols, rows, jsfeat.U8_t | jsfeat.C4_t, dataBuffer);
+
+        //var gray = new jsfeat.matrix_t(mat.cols, mat.rows, jsfeat.U8_t | jsfeat.C1_t);
+        //jsfeat.imgproc.grayscale(mat.data, mat.cols, mat.rows, gray);
+
+        //console.log("mat antes");
+		//console.log(mat);
+
+        console.log("cols");
+        console.log(cols);
+        console.log("rows");
+        console.log(rows);
+
+
+		var red = 0;
+        var green = 0;
+        var blue = 0;
+        var index_red = 0;
+        var index_green = 0;
+        var index_blue = 0;
+
+        var grid_matrix = [];
+        var grid_matrix_index = 0;
+
+		var index = 0;
+		for(var r = 0; r < mat.rows; r++) {
+			for(var c = 0; c < mat.cols; c++) {
+			
+
+                // red
+                //mat.data[index] = 0;
+                red = mat.data[index];
+                index_red = index;
+
+                index++;
+
+                // green
+                //mat.data[index] = 255;
+                green = mat.data[index];
+                index_green = index;
+
+                index++;
+
+                // blue
+                //mat.data[index] = 0;
+                blue = mat.data[index];
+                index_blue = index;
+
+                index++;
+
+                // alpha
+                //mat.data[index] = 0;
+
+
+                if((red + green + blue) / 3 > 175) {
+                    mat.data[index_red] = 0;
+                    mat.data[index_green] = 0;
+                    mat.data[index_blue] = 0;
+
+                    grid_matrix[grid_matrix_index] = 1;
+
+
+                } else {
+                    mat.data[index_red] = 255;
+                    mat.data[index_green] = 255;
+                    mat.data[index_blue] = 255;
+
+                    grid_matrix[grid_matrix_index] = 0;
+
+                }
+
+                $('#grid_matrix').append(''+grid_matrix[grid_matrix_index]+',');
+
+
+
+                index++;
+                grid_matrix_index++;
+
+				
+			}			
+
+            $('#grid_matrix').append('<br>');
+		}
+
+		console.log("mat depois");
+		console.log(mat);
+
+
+        drawMat(mat, document.getElementById('images'), 'canvas-img');
+        //drawMat(mat, document.getElementById('images'), 'canvas-img2');
+    };
+</script>
+</body>
+</html>

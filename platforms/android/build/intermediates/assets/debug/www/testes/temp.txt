@@ -1,0 +1,12 @@
+#search_grid {
+	background: rgba(0, 0, 255, .25);
+	width: 100%;
+	height: 100%;
+	left: 50%;
+	top: 50%;
+	position: fixed;
+	-webkit-transform: translate(-50%, -50%);
+	transform-origin: center center;
+	transition: transform 400ms;
+}
+

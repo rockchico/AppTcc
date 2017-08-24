@@ -1,0 +1,248 @@
+<html>
+<head>
+    <title>Optical flow detection in JavaScript</title>
+    <style type="text/css">
+
+
+        #videoOut {
+            left: 0;
+            top: 0;
+            margin-left: 0px;
+            margin-top: 0px;
+            position: absolute;
+        }
+
+        #ballScene {
+            left: 0;
+            top: 480px;
+            margin-left: 0px;
+            margin-top: 0px;
+            position: absolute;
+        }
+
+        #scene {
+            left: 0;
+            top: 960px;
+            margin-left: 0px;
+            margin-top: 0px;
+            position: absolute;
+            background-color: white;
+        }
+
+
+    </style>
+    <script type="text/javascript" src="../../js/oflow.js"></script>
+    <script type="text/javascript" src="../../teste-f7-1/colors.js"></script>
+
+</head>
+<body onload="main()" style='background-color: black'>
+    <div style='float:left'>
+        <video id='videoOut' width='640px' height='480px'></video><br />
+        <canvas id='ballScene' width='640px' height='480px'></canvas>
+    </div>
+    <canvas id='scene' width='640px' height='480px'></canvas>
+
+
+
+    <script type="text/javascript">
+
+        var myGamePiece;
+
+        function startGame() {
+            myGamePiece = new component(10, 10, "red", 225, 225);
+            myGameArea.start();
+        }
+
+        var myGameArea = {
+            canvas : document.getElementById("ballScene"),
+            start : function() {
+                this.context = this.canvas.getContext("2d");
+                this.frameNo = 0;
+                this.interval = setInterval(updateGameArea, 100);
+            },
+            stop : function() {
+                clearInterval(this.interval);
+            },
+            clear : function() {
+                //this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+        }
+
+        function component(width, height, color, x, y, type) {
+
+            this.type = type;
+            this.width = width;
+            this.height = height;
+            this.speed = 0;
+            this.angle = 0;
+            this.moveAngle = 90;
+            //this.speed = 10;
+            //this.angle = 90;
+            //this.moveAngle = 90;
+            this.x = x;
+            this.y = y;
+            this.update = function() {
+                ctx = myGameArea.context;
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+                ctx.fillStyle = color;
+                ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);
+
+                //var car = new Image();
+                //car.src="img/seta.png";
+                //ctx.drawImage(car, x, y);
+
+
+                ctx.restore();
+            }
+            this.newPos = function() {
+                this.angle += this.moveAngle * Math.PI / 180;
+                this.x += this.speed * Math.sin(this.angle);
+                this.y -= this.speed * Math.cos(this.angle);
+            }
+        }
+
+        function updateGameArea() {
+            myGameArea.clear();
+            //myGamePiece.moveAngle = 0;
+            //myGamePiece.speed = 0;
+            //if (myGameArea.keys && myGameArea.keys[37]) {myGamePiece.moveAngle = -1; }
+            //if (myGameArea.keys && myGameArea.keys[39]) {myGamePiece.moveAngle = 1; }
+            //if (myGameArea.keys && myGameArea.keys[38]) {myGamePiece.speed= 1; }
+            //if (myGameArea.keys && myGameArea.keys[40]) {myGamePiece.speed= -1; }
+            myGamePiece.newPos();
+            myGamePiece.update();
+        }
+
+
+
+
+        function main() {
+
+            startGame();
+
+            var zoneSize = 8,
+                videoElement = document.getElementById('videoOut'),
+                videoWidth = videoElement.videoWidth,
+                videoHeight = videoElement.videoHeight;
+            webCamFlow = new oflow.WebCamFlow(videoElement, zoneSize),
+                canvas = document.getElementById('scene'),
+                ballCanvas = document.getElementById('ballScene'),
+                sceneCtx = canvas.getContext('2d'),
+                ballCtx = ballCanvas.getContext('2d'),
+                sceneWidth = canvas.width,
+                sceneHeight = canvas.height,
+                ballSceneW = ballScene.width,
+                ballSceneH = ballScene.height,
+                ballX = ballSceneW / 2,
+                ballY = ballSceneH / 2;
+
+            ballCtx.fillStyle = '#bada55';
+
+            webCamFlow.onCalculated( function (direciton) {
+                // render zones
+                sceneCtx.clearRect(0, 0, sceneWidth, sceneHeight);
+                for(var i = 0; i < direciton.zones.length; ++i) {
+                    var zone = direciton.zones[i];
+                    sceneCtx.strokeStyle = getDirectionalColor(zone.u, zone.v);
+                    sceneCtx.beginPath();
+                    sceneCtx.moveTo(zone.x,zone.y);
+                    sceneCtx.lineTo((zone.x - zone.u), zone.y + zone.v);
+                    sceneCtx.stroke();
+                }
+
+
+
+
+                //myGamePiece.speed = direciton.v;
+
+                myGamePiece.moveAngle = 0;
+                myGamePiece.speed = 0;
+
+                var speed = Math.round(direciton.v / 0.1);
+                var moveAngle = Math.round(direciton.u / 0.1);
+
+                console.log("direciton.v speed= "+speed);
+                console.log("direciton.u moveAngle= "+moveAngle);
+
+                // traz -
+                // frente ++
+
+                // esuerda +
+                // direita -
+
+                if(speed < -4) {
+
+                    //for(var i = 0; i > speed; i--) {
+                    //    myGamePiece.speed = -1;
+                    //}
+                    myGamePiece.speed = -1;
+
+                } else if(speed > 4) {
+
+                    //for(var i = 0; i < speed; i++) {
+                    //    myGamePiece.speed = 1;
+                    //}
+                    myGamePiece.speed = 1;
+
+                } else {
+                    myGamePiece.speed = 0;
+                }
+
+
+                if(moveAngle < -4) {
+
+                    //for(var i = 0; i > moveAngle; i--) {
+                    //    myGamePiece.moveAngle = -1;
+                    //}
+                    myGamePiece.moveAngle = 2;
+
+                } else if(moveAngle > 4) {
+
+                    //for(var i = 0; i < moveAngle; i++) {
+                    //    myGamePiece.moveAngle = 1;
+                    //}
+                    myGamePiece.moveAngle = -2;
+
+                } else {
+                    myGamePiece.moveAngle = 0;
+                }
+
+                //console.log("direciton.v speed= "+Math.round(direciton.v / 0.1));
+
+
+
+
+                //console.log("angle: "+myGamePiece.angle);
+                //console.log("speed: "+myGamePiece.speed);
+                //console.log("moveAngle: "+myGamePiece.moveAngle);
+
+
+                // render ball:
+                //ballCtx.clearRect(0, 0, ballSceneW, ballSceneH);
+                //ballCtx.beginPath();
+                //ballX -= direciton.u * 5;
+                //ballY += direciton.v * 5;
+                //if (ballX < 0) { ballX = 0; }
+                //if (ballX > ballSceneW) { ballX = ballSceneW; }
+                //if (ballY < 0) { ballY = 0; }
+                //if (ballY > ballSceneH) { ballY = ballSceneH; }
+                //ballCtx.arc(ballX, ballY, 10, 0, 2 * Math.PI, false);
+                //ballCtx.fillStyle = 'yellow';
+                //ballCtx.fill();
+                //ballCtx.stroke();
+
+
+
+
+
+
+            });
+
+            webCamFlow.startCapture();
+        }
+    </script>
+
+</body>
+</html>

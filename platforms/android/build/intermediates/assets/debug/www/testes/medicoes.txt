@@ -1,0 +1,13 @@
+this.blur_size = 5;
+            this.lap_thres = 30;
+            this.eigen_thres = 25;
+            this.match_threshold = 48;
+
+            // francisco
+            //this.blur_size = 5;
+            //this.lap_thres = 20;
+            //this.eigen_thres = 20;
+            this.match_threshold = 70;
+
+            this.max_matches_per_level = 300; // orig = 300
+            this.max_matches = 500; // orig = 500

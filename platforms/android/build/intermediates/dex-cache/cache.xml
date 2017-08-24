@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="/var/www/html/AppTcc/platforms/android/libs/sqlite-connector.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.3"
+        sha1="76169ab23a4f939925491c6fe186749da5a56ee9">
+        <dex dex="/var/www/html/AppTcc/platforms/android/build/intermediates/pre-dexed/debug/sqlite-connector_46e0a14be6a97dca4ff3653a3e6b2db1e2c5b55e.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/var/www/html/AppTcc/platforms/android/build/intermediates/exploded-aar/com.android.support/support-v4/24.1.1/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.3"
+        sha1="6d7d803871e3203465f71a163e7af104f807b446">
+        <dex dex="/var/www/html/AppTcc/platforms/android/build/intermediates/pre-dexed/debug/com.android.support-support-v4-24.1.1_7429a6029b9972289a1c4dc2e93074e54f085952.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/var/www/html/AppTcc/platforms/android/build/intermediates/exploded-aar/org.apache.cordova/CordovaLib/6.2.3/debug/jars/classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.3"
+        sha1="e0d106fb56b07f7815295f343d04d2c12b51f0aa">
+        <dex dex="/var/www/html/AppTcc/platforms/android/build/intermediates/pre-dexed/debug/CordovaLib-6.2.3-debug_635f15da1a52d06c6b2118373b6d9f86982951a3.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/home/francisco/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/24.1.1/support-annotations-24.1.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.3"
+        sha1="3af19f153122737b372622fa6c81dd11a1c6b999">
+        <dex dex="/var/www/html/AppTcc/platforms/android/build/intermediates/pre-dexed/debug/support-annotations-24.1.1_99946d411b00d08577d1fdbefc8002285f388ff4.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="/var/www/html/AppTcc/platforms/android/build/intermediates/exploded-aar/com.android.support/support-v4/24.1.1/jars/libs/internal_impl-24.1.1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="25.0.3"
+        sha1="f78c2f395cb096f9dc1dc07e729922b8fcd3c4f5">
+        <dex dex="/var/www/html/AppTcc/platforms/android/build/intermediates/pre-dexed/debug/internal_impl-24.1.1_7f3966f774011255af3b788c8482cebbff66b0fa.jar" />
+    </item>
+
+</items>
