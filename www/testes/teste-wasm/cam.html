@@ -53,6 +53,7 @@
         "use strict";
 
         var stat = new profiler();
+        stat.add("teste_features");
 
         // lets do some fun
         var video = document.getElementById('webcam');
@@ -114,7 +115,7 @@
             $('#no_rtc').show();
         }
 
-        var stat = new profiler();
+        
         
 
 
@@ -130,7 +131,7 @@
         var indexFrame = 0;
 
         function makeFrameProcessor() {
-
+            
             var fp = addVideoElements();
 
             // Somewhat based on http://www.kaizou.org/2012/09/frame-by-frame-video-effects-using-html5-and/
@@ -179,6 +180,9 @@
 
             // Compute and display the next frame
             fp.renderFrame = function () {
+                
+                stat.new_frame();
+                
                 // Acquire a video frame from the video element
                 fp.ctx.drawImage(fp.video, 0, 0, fp.video.videoWidth,
                     fp.video.videoHeight, 0, 0, fp.width, fp.height);
@@ -209,7 +213,9 @@
                 //Module._teste_blur(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, fp.color_change_speed);
                 //Module._teste_gray(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, indexFrame);
 
+                stat.start("teste_features");
                 Module._teste_features(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, indexFrame);
+                stat.stop("teste_features");
                 
 
 
@@ -220,6 +226,8 @@
                 img_data.data.set(fp.frame_bytes);
                 // Render to viewport: depois de aplicar as funções
                 fp.viewport.putImageData(img_data, 0, 0);
+
+                console.log(stat.log());
             };
 
             // Rendering call-back
@@ -234,13 +242,15 @@
 
             // Some platforms seem to disable autoplay
             // so wait a moment and display the controls and call play() manually
-            setTimeout(function() {
-                var isPlaying = 0 < fp.video.currentTime && !fp.video.paused && !fp.video.ended && 2 < fp.video.readyState;
-                if (!isPlaying) {
-                    fp.video.controls = true;
-                    fp.video.play();
-                }
-            }, 200);
+            // setTimeout(function() {
+            //     var isPlaying = 0 < fp.video.currentTime && !fp.video.paused && !fp.video.ended && 2 < fp.video.readyState;
+            //     if (!isPlaying) {
+            //         fp.video.controls = true;
+            //         fp.video.play();
+            //     }
+            // }, 200);
+
+            
 
             return fp;
         };
