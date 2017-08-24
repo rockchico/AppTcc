@@ -77,7 +77,7 @@
                 }
             };
             var onDimensionsReady = function(width, height) {
-                demo_app(width, height);
+                makeFrameProcessor();
                 compatibility.requestAnimationFrame(tick);
             };
 
@@ -116,36 +116,7 @@
         }
 
         var stat = new profiler();
-        var ctx, ctx2;
-
-        function demo_app(videoWidth, videoHeight) {
-
-            stat.add("rotate_color");
-
-            ctx = canvas.getContext('2d');
-            ctx2 = canvas2.getContext('2d');
-
-            makeFrameProcessor();
-
-
-
-
-
-        }
-
-
-        function tick() {
-            compatibility.requestAnimationFrame(tick);
-            stat.new_frame();
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                ctx2.drawImage(video, 0, 0, 640, 480);
-                //var imageData = ctx.getImageData(0, 0, 640, 480);
-
-                //console.log(stat.log());
-
-
-            }
-        }
+        
 
 
 
@@ -153,7 +124,7 @@
 
         function addVideoElements() {
 
-            return { video: video, canvas: canvas };
+            return { video: video, canvas: canvas, canvas2: canvas2 };
         }
 
 
@@ -165,6 +136,8 @@
 
             // Somewhat based on http://www.kaizou.org/2012/09/frame-by-frame-video-effects-using-html5-and/
             fp.viewport = fp.canvas.getContext("2d");
+            fp.viewport2 = fp.canvas2.getContext("2d");
+
             fp.width = fp.canvas.width;
             fp.height = fp.canvas.height;
             // Create the frame-buffer canvas
@@ -223,6 +196,9 @@
                     fp.frame_bytes.set(img_data.data);
                 }
 
+                // Render to viewport: antes de aplicar funções
+                fp.viewport2.putImageData(img_data, 0, 0);
+
                 // Perform operation on copy, no additional conversions needed, direct pointer manipulation
                 // results will be put directly into the output param.
 
@@ -243,7 +219,7 @@
 
                 // copy output to ImageData
                 img_data.data.set(fp.frame_bytes);
-                // Render to viewport
+                // Render to viewport: depois de aplicar as funções
                 fp.viewport.putImageData(img_data, 0, 0);
             };
 
