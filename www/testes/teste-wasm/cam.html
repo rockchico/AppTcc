@@ -15,7 +15,7 @@
 
         #canvas {
             left: 0;
-            top: 480px;
+            top: 700px;
             position: absolute;
             border: 1px solid black;
         }
@@ -75,8 +75,8 @@ var featuresReady = checkFeatures(document.getElementById("info"), {webrtc: true
 
 
 var Module = {
-    wasmBinaryFile: 'color_cycle_asm.wasm',
-    //wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/opencvjs/build/wasm/opencv_js.wasm',
+    //wasmBinaryFile: 'color_cycle_asm.wasm',
+    wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/teste-wasm/color_cycle_asm.wasm',
     //wasmBinaryFile: 'https://192.168.99.4/AppTcc/www/testes/wasm1/build/wasm/opencv_js.wasm',
 
 
@@ -145,7 +145,9 @@ var Module = {
                 //deviceId: {exact: "e6cb32e3da6356f1c650fd7136b2cbfa6f1a76950a69326baab56b6f8da3c346"},
                 width: {exact: 640},
                 height: {exact: 480}
-            }};
+            },  
+                audio: false
+            };
 
             compatibility.getUserMedia(teste123, function(stream) {
                 try {
@@ -247,6 +249,9 @@ var Module = {
                     fp.frame_bytes.set(img_data.data);
                 }
 
+
+                // copy output to ImageData
+                img_data.data.set(fp.frame_bytes);
                 // Render to viewport: antes de aplicar funções
                 fp.viewport2.putImageData(img_data, 0, 0);
 
