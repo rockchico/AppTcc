@@ -267,10 +267,10 @@ var Module = {
                 //Module._teste_gray(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, indexFrame);
 
                 stat.start("teste_features");
-                Module._teste_features(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, indexFrame);
+                //Module._teste_features(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, indexFrame);
                 stat.stop("teste_features");
                 
-
+                console.log(Module._teste_return(10));
 
 
                 indexFrame++;
@@ -280,7 +280,7 @@ var Module = {
                 // Render to viewport: depois de aplicar as funções
                 fp.viewport.putImageData(img_data, 0, 0);
 
-                console.log(stat.log());
+                //console.log(stat.log());
             };
 
             // Rendering call-back
