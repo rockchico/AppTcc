@@ -76,8 +76,8 @@ var featuresReady = checkFeatures(document.getElementById("info"), {webrtc: true
 
 var Module = {
     //wasmBinaryFile: 'color_cycle_asm.wasm',
-    wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/teste-wasm/color_cycle_asm.wasm',
-    //wasmBinaryFile: 'https://192.168.99.4/AppTcc/www/testes/wasm1/build/wasm/opencv_js.wasm',
+    //wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/teste-wasm/color_cycle_asm.wasm',
+    wasmBinaryFile: 'https://192.168.99.14/AppTcc/www/testes/teste-wasm/color_cycle_asm.wasm',
 
 
     _main: function() {
@@ -102,6 +102,9 @@ var Module = {
 
     function initApp() {
 
+        var frameIndex = 0;
+        var frame_0;
+        var frame_1;
 
         var stat = new profiler();
         stat.add("teste_features");
@@ -178,7 +181,7 @@ var Module = {
         }
 
 
-        var indexFrame = 0;
+        
 
         function makeFrameProcessor() {
             
@@ -248,6 +251,7 @@ var Module = {
                 else {
                     fp.frame_bytes.set(img_data.data);
                 }
+                
 
 
                 // copy output to ImageData
@@ -267,13 +271,13 @@ var Module = {
                 //Module._teste_gray(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, indexFrame);
 
                 stat.start("teste_features");
-                //Module._teste_features(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, indexFrame);
+                Module._teste_features(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset);
                 stat.stop("teste_features");
                 
                 console.log(Module._teste_return(10));
 
 
-                indexFrame++;
+                frameIndex++;
 
                 // copy output to ImageData
                 img_data.data.set(fp.frame_bytes);
