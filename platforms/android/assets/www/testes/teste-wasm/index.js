@@ -1,3 +1,34 @@
+// lets do some fun
+let width = 0;
+let height = 0;
+
+let qvga = {width: {exact: 320}, height: {exact: 240}};
+
+let vga = {width: {exact: 640}, height: {exact: 480}};
+
+let resolution = window.innerWidth < 640 ? qvga : vga;
+
+// whether streaming video from the camera.
+let streaming = false;
+
+let video = document.getElementById("webcam");
+let stream = null;
+let vc = null;
+
+// // 0dbcc35221ffd40cb0d5eb6024f427f9b50da577a838739d963529ae71cfda8f
+// // e6cb32e3da6356f1c650fd7136b2cbfa6f1a76950a69326baab56b6f8da3c346
+
+// var teste123 = {video: {
+//   facingMode: {exact: "environment"},
+//   //deviceId: {exact: "e6cb32e3da6356f1c650fd7136b2cbfa6f1a76950a69326baab56b6f8da3c346"},
+//   width: {exact: 320},
+//   height: {exact: 240}
+// },  
+//   audio: false
+// };
+
+
+
 
 let info = document.getElementById('info');
 let container = document.getElementById('container');
@@ -11,4 +42,29 @@ function WasmIsReady() {
   info.innerHTML = '';
   container.className = '';
 
+}
+
+function startCamera() {
+  if (streaming) return;
+  navigator.mediaDevices.getUserMedia({video: resolution, audio: false})
+    .then(function(s) {
+    stream = s;
+    video.srcObject = s;
+    video.play();
+  })
+    .catch(function(err) {
+    console.log("An error occured! " + err);
+  });
+
+  video.addEventListener("canplay", function(ev){
+    if (!streaming) {
+      height = video.videoHeight;
+      width = video.videoWidth;
+      video.setAttribute("width", width);
+      video.setAttribute("height", height);
+      streaming = true;
+      vc = new cv.VideoCapture(video);
+    }
+    startVideoProcessing();
+  }, false);
 }

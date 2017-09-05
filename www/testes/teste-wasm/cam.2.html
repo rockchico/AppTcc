@@ -1,0 +1,306 @@
+
+<!doctype html>
+
+<html lang="en">
+<head>
+
+    <title>TESTE WASM</title>
+
+    <style>
+        #webcam {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        #canvas {
+            left: 0;
+            /* top: 500px; */
+            top: 0;
+            position: absolute;
+            border: 1px solid black;
+        }
+
+        /* #canvas2 {
+            left: 0;
+            top: 0;
+            position: absolute;
+            border: 1px solid black;
+        } */
+
+
+        .invisible {
+            display: none;
+        }
+
+        #info {
+            font: 14px 'Lucida Grande', sans-serif;
+        }
+
+
+
+    </style>
+
+
+</head>
+<body>
+
+<div id="container" class="invisible">
+    <div id="info" class="text-center">
+        Wasm is loading...
+    </div>
+    
+    
+    <video id="webcam" width="320" height="240" style="display:none;"></video>
+    <div>
+        <canvas id="canvas" width="320" height="240"></canvas>
+        <canvas id="canvas2" width="320" height="240"></canvas>
+        <div id="no_rtc" class="alert alert-error" style="display:none;"></div>
+        <div id="log" class="alert alert-info"></div>
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript" src="jquery.min.js"></script>
+<!-- <script type="text/javascript" src="compatibility.js"></script> -->
+<!-- <script type="text/javascript" src="profiler.js"></script> -->
+<script type="text/javascript" src="adapter-latest.js"></script>
+<script type="text/javascript" src="stats.min.js"></script>
+
+<script src="utils.js"></script>
+<script>
+var featuresReady = checkFeatures(document.getElementById("info"), {webrtc: true, wasm: true});
+</script>
+<script src="index.js"></script>
+<script>
+
+
+var Module = {
+    //wasmBinaryFile: 'color_cycle_asm.wasm',
+    //wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
+    wasmBinaryFile: 'https://192.168.99.2/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
+    //wasmBinaryFile: 'https://179.190.70.191/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
+
+    _main: function() {
+        WasmIsReady();
+        startCamera();
+        initApp();
+    },
+
+    _exit: function(opa) {
+
+    }
+};
+</script>
+
+<!-- 
+    - usar o adapter ao inves compability    
+    https://github.com/webrtc/adapter 
+
+
+-->
+
+
+
+
+
+<script type="text/javascript">
+
+    //https://github.com/mrdoob/stats.js
+    var stats = new Stats();
+    stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+    document.body.appendChild( stats.dom );
+
+    function initApp() {
+
+        var frameIndex = 0;
+        var frame_0;
+        var frame_1;
+
+        // var stat = new profiler();
+        // stat.add("teste_match");
+
+        var canvas = document.getElementById('canvas');
+        var canvas2 = document.getElementById('canvas2');
+
+
+        
+       
+
+        makeFrameProcessor();
+
+        
+        function addVideoElements() {
+
+            return { video: video, canvas: canvas, canvas2: canvas2 };
+        }
+
+
+        
+
+        function makeFrameProcessor() {
+            
+            var fp = addVideoElements();
+
+            // Somewhat based on http://www.kaizou.org/2012/09/frame-by-frame-video-effects-using-html5-and/
+            fp.viewport = fp.canvas.getContext("2d");
+            fp.viewport2 = fp.canvas2.getContext("2d");
+
+            fp.width = fp.canvas.width;
+            fp.height = fp.canvas.height;
+            // Create the frame-buffer canvas
+            fp.framebuffer = document.createElement("canvas");
+            fp.framebuffer.width = fp.width;
+            fp.framebuffer.height = fp.height;
+            fp.ctx = fp.framebuffer.getContext("2d");
+
+            // Start rendering when the video is playing
+            fp.playHandler = function () {
+                // check if video frames are ready, if not try again a bit later.
+                if (0 == fp.video.videoWidth || 0 == fp.video.videoHeight) {
+                    setTimeout(fp.playHandler, 10);
+                    return;
+                }
+
+                fp.canvas.width = fp.video.videoWidth;
+                fp.canvas.height = fp.video.videoHeight;
+                fp.width = fp.canvas.width;
+                fp.height = fp.canvas.height;
+                fp.framebuffer.width = fp.width;
+                fp.framebuffer.height = fp.height;
+                fp.render();
+            }
+            fp.video.addEventListener("play", fp.playHandler, false);
+
+            fp.color_change_speed = 10;
+
+            function _freeArray(heapBytes) {
+                Module._free(heapBytes.byteOffset);
+            }
+
+            function _arrayToHeap(typedArray) {
+                var numBytes = typedArray.length * typedArray.BYTES_PER_ELEMENT;
+                var ptr = Module._malloc(numBytes);
+                var heapBytes = Module.HEAPU8.subarray(ptr, ptr + numBytes);
+                heapBytes.set(typedArray);
+                return heapBytes;
+            }
+
+            // Compute and display the next frame
+            fp.renderFrame = function () {
+                
+                
+                
+                // Acquire a video frame from the video element
+                fp.ctx.drawImage(fp.video, 0, 0, fp.video.videoWidth,
+                    fp.video.videoHeight, 0, 0, fp.width, fp.height);
+
+                var img_data = fp.ctx.getImageData(0, 0, fp.width, fp.height);
+
+                if (!fp.frame_bytes) {
+                    fp.frame_bytes = _arrayToHeap(img_data.data);
+                }
+                else if (fp.frame_bytes.length !== img_data.data.length) {
+                    _freeArray(fp.frame_bytes); // free heap memory
+                    fp.frame_bytes = _arrayToHeap(img_data.data);
+                }
+                else {
+                    fp.frame_bytes.set(img_data.data);
+                }
+
+
+                // ##################
+
+                // copy output to ImageData
+                //img_data.data.set(fp.frame_bytes);
+                // Render to viewport: antes de aplicar funções
+                //fp.viewport2.putImageData(img_data, 0, 0);
+
+                // Perform operation on copy, no additional conversions needed, direct pointer manipulation
+                // results will be put directly into the output param.
+
+
+                //stat.start("teste_match");
+                Module._teste_match(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, frameIndex);
+
+                //Module._teste_gray(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, frameIndex);
+
+                //stat.stop("teste_match");
+                
+                //console.log(Module._teste_return(10));
+
+
+                
+
+                // copy output to ImageData
+                img_data.data.set(fp.frame_bytes);
+                // Render to viewport: depois de aplicar as funções
+                fp.viewport.putImageData(img_data, 0, 0);
+
+                
+
+                frameIndex++;
+
+                
+                
+            };
+
+            // Rendering call-back
+            fp.render = function () {
+                
+                //stat.new_frame();
+                stats.begin();
+                
+                if (fp.video.paused || fp.video.ended) {
+                    return;
+                }
+                fp.renderFrame();
+
+                stats.end();
+
+                var self = fp;
+                requestAnimationFrame(self.render);
+
+                //console.log(stat.log());
+                
+            };
+
+            // Some platforms seem to disable autoplay
+            // so wait a moment and display the controls and call play() manually
+            // setTimeout(function() {
+            //     var isPlaying = 0 < fp.video.currentTime && !fp.video.paused && !fp.video.ended && 2 < fp.video.readyState;
+            //     if (!isPlaying) {
+            //         fp.video.controls = true;
+            //         fp.video.play();
+            //     }
+            // }, 200);
+
+            
+
+            return fp;
+        };
+
+    }
+
+    
+
+
+
+
+
+    // $(window).load(function() {
+    //     "use strict";
+
+    //     $(window).unload(function() {
+    //         video.pause();
+    //         video.src=null;
+    //     });
+    // });
+</script>
+
+<script type="text/javascript" src='app_tcc_wasm.js'></script>
+
+</body>
+</html>

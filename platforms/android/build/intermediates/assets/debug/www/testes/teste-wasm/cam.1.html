@@ -51,10 +51,10 @@
     </div>
     
     
-    <video id="webcam" width="640" height="480" style="display:none;"></video>
+    <video id="webcam" width="320" height="240" style="display:none;"></video>
     <div>
-        <canvas id="canvas" width="640" height="480"></canvas>
-        <canvas id="canvas2" width="640" height="480"></canvas>
+        <canvas id="canvas" width="320" height="240"></canvas>
+        <canvas id="canvas2" width="320" height="240"></canvas>
         <div id="no_rtc" class="alert alert-error" style="display:none;"></div>
         <div id="log" class="alert alert-info"></div>
     </div>
@@ -93,7 +93,12 @@ var Module = {
 };
 </script>
 
+<!-- 
+    - usar o adapter ao inves compability    
+    https://github.com/webrtc/adapter 
 
+
+-->
 
 
 
@@ -136,7 +141,7 @@ var Module = {
                         attempts++;
                         setTimeout(findVideoSize, 200);
                     } else {
-                        onDimensionsReady(640, 480);
+                        onDimensionsReady(320, 240);
                     }
                 }
             };
@@ -152,10 +157,10 @@ var Module = {
             // e6cb32e3da6356f1c650fd7136b2cbfa6f1a76950a69326baab56b6f8da3c346
 
             var teste123 = {video: {
-                //facingMode: {exact: "environment"},
+                facingMode: {exact: "environment"},
                 //deviceId: {exact: "e6cb32e3da6356f1c650fd7136b2cbfa6f1a76950a69326baab56b6f8da3c346"},
-                width: {exact: 640},
-                height: {exact: 480}
+                width: {exact: 320},
+                height: {exact: 240}
             },  
                 audio: false
             };
