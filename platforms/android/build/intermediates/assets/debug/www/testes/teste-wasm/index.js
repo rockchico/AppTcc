@@ -1,12 +1,12 @@
-// lets do some fun
-let width = 0;
-let height = 0;
+// // lets do some fun
+// let width = 0;
+// let height = 0;
 
-let qvga = {width: {exact: 320}, height: {exact: 240}};
+// let qvga = {width: {exact: 320}, height: {exact: 240}};
 
-let vga = {width: {exact: 640}, height: {exact: 480}};
+// let vga = {width: {exact: 640}, height: {exact: 480}};
 
-let resolution = window.innerWidth < 640 ? qvga : vga;
+// let resolution = window.innerWidth < 640 ? qvga : vga;
 
 // whether streaming video from the camera.
 let streaming = false;
@@ -18,14 +18,14 @@ let vc = null;
 // // 0dbcc35221ffd40cb0d5eb6024f427f9b50da577a838739d963529ae71cfda8f
 // // e6cb32e3da6356f1c650fd7136b2cbfa6f1a76950a69326baab56b6f8da3c346
 
-// var teste123 = {video: {
-//   facingMode: {exact: "environment"},
-//   //deviceId: {exact: "e6cb32e3da6356f1c650fd7136b2cbfa6f1a76950a69326baab56b6f8da3c346"},
-//   width: {exact: 320},
-//   height: {exact: 240}
-// },  
-//   audio: false
-// };
+var cameraFlags = {video: {
+  facingMode: {exact: "environment"},
+  //deviceId: {exact: "e6cb32e3da6356f1c650fd7136b2cbfa6f1a76950a69326baab56b6f8da3c346"},
+  width: {exact: 320},
+  height: {exact: 240}
+},  
+  audio: false
+};
 
 
 
@@ -46,7 +46,7 @@ function WasmIsReady() {
 
 function startCamera() {
   if (streaming) return;
-  navigator.mediaDevices.getUserMedia({video: resolution, audio: false})
+  navigator.mediaDevices.getUserMedia(cameraFlags)
     .then(function(s) {
     stream = s;
     video.srcObject = s;
@@ -63,8 +63,8 @@ function startCamera() {
       video.setAttribute("width", width);
       video.setAttribute("height", height);
       streaming = true;
-      vc = new cv.VideoCapture(video);
+      
     }
-    startVideoProcessing();
+    //startVideoProcessing();
   }, false);
 }
