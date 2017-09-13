@@ -79,9 +79,9 @@ var featuresReady = checkFeatures(document.getElementById("info"), {webrtc: true
 
 var Module = {
     //wasmBinaryFile: 'color_cycle_asm.wasm',
-    wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
+    //wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
     //wasmBinaryFile: 'https://192.168.99.2/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
-    //wasmBinaryFile: 'https://179.190.70.191/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
+    wasmBinaryFile: 'https://192.168.43.189/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
 
     _main: function() {
         WasmIsReady();
@@ -114,24 +114,19 @@ var Module = {
         var canvas = document.getElementById('canvas');
         var canvas2 = document.getElementById('canvas2');
 
-
-        
-       
-
+        // chama a função que processa os quadros do vídeo
         makeFrameProcessor();
-
-        
-        function addVideoElements() {
-
-            return { video: video, canvas: canvas, canvas2: canvas2 };
-        }
-
-
-        
 
         function makeFrameProcessor() {
             
-            var fp = addVideoElements();
+            //var fp = addVideoElements();
+
+            var fp = {};
+
+            fp.video = video;
+            fp.canvas = canvas;
+            fp.canvas2 = canvas2;
+
 
             // Somewhat based on http://www.kaizou.org/2012/09/frame-by-frame-video-effects-using-html5-and/
             fp.viewport = fp.canvas.getContext("2d");
@@ -212,7 +207,12 @@ var Module = {
 
 
                 //stat.start("teste_match");
-                Module._teste_match(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, frameIndex);
+
+            
+                console.log(Module._teste_match(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, frameIndex));
+                
+                //Module._teste_features(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset);
+
 
                 //Module._teste_gray(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, frameIndex);
 
