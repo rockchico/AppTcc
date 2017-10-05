@@ -1,3 +1,36 @@
+var cameraFlags = {video: {
+  //facingMode: {exact: "environment"},
+  //deviceId: {exact: "e6cb32e3da6356f1c650fd7136b2cbfa6f1a76950a69326baab56b6f8da3c346"},
+  width: {exact: 320},
+  height: {exact: 240}
+},  
+  audio: false
+};
+
+function gotDevices(deviceInfos) {
+
+  for (var i = 0; i !== deviceInfos.length; ++i) {
+    var deviceInfo = deviceInfos[i];
+    
+    if (deviceInfo.kind === 'videoinput') {
+        
+        cameraFlags.video.deviceId = {exact: deviceInfo.deviceId};
+
+        console.log(deviceInfo);
+
+    } else {
+        //console.log('Some other kind of source/device: ', deviceInfo);
+    }
+  }
+
+}
+
+function handleError(error) {
+  console.log('navigator.getUserMedia error: ', error);
+}
+
+navigator.mediaDevices.enumerateDevices().then(gotDevices).catch(handleError);
+
 // // lets do some fun
 // let width = 0;
 // let height = 0;
@@ -18,14 +51,7 @@ let vc = null;
 // // 0dbcc35221ffd40cb0d5eb6024f427f9b50da577a838739d963529ae71cfda8f
 // // e6cb32e3da6356f1c650fd7136b2cbfa6f1a76950a69326baab56b6f8da3c346
 
-var cameraFlags = {video: {
-  facingMode: {exact: "environment"},
-  //deviceId: {exact: "e6cb32e3da6356f1c650fd7136b2cbfa6f1a76950a69326baab56b6f8da3c346"},
-  width: {exact: 320},
-  height: {exact: 240}
-},  
-  audio: false
-};
+
 
 
 
