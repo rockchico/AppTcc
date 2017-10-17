@@ -1,0 +1,524 @@
+
+<!doctype html>
+
+<html lang="en">
+<head>
+
+    <title>TESTE WASM</title>
+
+    <style>
+        #webcam {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        #canvas {
+            left: 0;
+            /* top: 500px; */
+            top: 0;
+            position: absolute;
+            border: 1px solid black;
+        }
+
+        /* #canvas2 {
+            left: 0;
+            top: 0;
+            position: absolute;
+            border: 1px solid black;
+        } */
+
+
+        .invisible {
+            display: none;
+        }
+
+        #info {
+            font: 14px 'Lucida Grande', sans-serif;
+        }
+
+        #ballScene {
+            left: 50%;
+            top: 400px;
+            margin-left: -300px;
+            margin-top: 0px;
+            position: absolute;
+            background-color: #0e90d2;
+        }
+
+
+
+    </style>
+
+
+</head>
+<body>
+
+<div id="container" class="invisible">
+    <div id="info" class="text-center">
+        Wasm is loading...
+    </div>
+    
+    
+    <video id="webcam" width="320" height="240" style="display:none;"></video>
+    <div>
+        <canvas id="canvas" width="320" height="240"></canvas>
+        <canvas id="canvas2" width="320" height="240"></canvas>
+        <div id="no_rtc" class="alert alert-error" style="display:none;"></div>
+        <div id="log" class="alert alert-info"></div>
+    </div>
+
+
+    <canvas id='ballScene' width='600px' height='600px'></canvas>
+
+</div>
+
+
+
+
+<script type="text/javascript" src="jquery.min.js"></script>
+<!-- <script type="text/javascript" src="compatibility.js"></script> -->
+<!-- <script type="text/javascript" src="profiler.js"></script> -->
+<script type="text/javascript" src="adapter-latest.js"></script>
+<script type="text/javascript" src="stats.min.js"></script>
+
+<script src="utils.js"></script>
+<script>
+var featuresReady = checkFeatures(document.getElementById("info"), {webrtc: true, wasm: true});
+</script>
+<script src="index.js"></script>
+<script>
+
+
+var Module = {
+    //wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
+    wasmBinaryFile: 'https://192.168.99.14/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
+    //wasmBinaryFile: 'https://192.168.43.189/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
+
+    _main: function() {
+        WasmIsReady();
+        startCamera();
+
+        window.onload = function () {
+            
+        };
+
+        initApp();
+
+
+        
+    },
+
+    _exit: function(opa) {
+
+    }
+};
+</script>
+
+<script type="text/javascript">
+
+
+    //https://github.com/mrdoob/stats.js
+    var stats = new Stats();
+    stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
+    document.body.appendChild( stats.dom );
+
+
+    // #################################################
+
+    var myGamePiece;
+
+    function startGame() {
+        myGamePiece = new component(20, 20, "red", 225, 225);
+        myGameArea.start();
+    }
+
+    var myGameArea = {
+
+        points: [],
+        maxPoints: 100,
+        countPoint: 0,
+
+        addPoint: function (point) {
+
+            if(this.countPoint < this.maxPoints) {
+                this.points.push(point);
+                this.countPoint ++;
+            } else {
+                this.points.shift();
+
+                this.points.push(point);
+            }
+
+        },
+
+        canvas : document.getElementById("ballScene"),
+
+        start : function() {
+            this.context = this.canvas.getContext("2d");
+        },
+        stop : function() {
+            clearInterval(this.interval);
+        },
+        clear : function() {
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+    }
+
+    function component(width, height, color, x, y, type) {
+
+        var ctx;
+
+        this.type = type;
+        this.width = width;
+        this.height = height;
+        this.speed = 10;
+        this.angle = 90;
+        this.moveAngle = 90;
+        this.x = x;
+        this.y = y;
+        this.update = function() {
+            ctx = myGameArea.context;
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+            ctx.fillStyle = color;
+            ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);
+
+            //var car = new Image();
+            //car.src="img/seta.png";
+            //ctx.drawImage(car, x, y);
+
+            ctx.restore();
+
+            myGameArea.addPoint({"x": this.x, "y": this.y});
+
+
+            for(var i = 0; i < myGameArea.points.length; i++) {
+
+                ctx.beginPath();
+                ctx.arc(myGameArea.points[i].x, myGameArea.points[i].y, 3, 0, 2 * Math.PI, false);
+                ctx.fillStyle = 'green';
+                ctx.fill();
+
+            }
+        }
+        this.newPos = function() {
+            this.angle += this.moveAngle * Math.PI / 180;
+            this.x += this.speed * Math.sin(this.angle);
+            this.y -= this.speed * Math.cos(this.angle);
+        }
+    }
+
+    // #################################################
+
+    
+
+
+
+
+
+    function initApp() {    
+        
+        var frameIndex = 0;
+        var frame_0;
+        var frame_1;
+
+
+        startGame();
+
+        // var stat = new profiler();
+        // stat.add("teste_match");
+
+        var canvas = document.getElementById('canvas');
+        var canvas2 = document.getElementById('canvas2');
+
+        // chama a função que processa os quadros do vídeo
+        makeFrameProcessor();
+
+        function makeFrameProcessor() {
+            
+            //var fp = addVideoElements();
+
+            var fp = {};
+
+            fp.video = video;
+            fp.canvas = canvas;
+            fp.canvas2 = canvas2;
+
+
+            // Somewhat based on http://www.kaizou.org/2012/09/frame-by-frame-video-effects-using-html5-and/
+            fp.viewport = fp.canvas.getContext("2d");
+            fp.viewport2 = fp.canvas2.getContext("2d");
+
+            fp.width = fp.canvas.width;
+            fp.height = fp.canvas.height;
+            // Create the frame-buffer canvas
+            fp.framebuffer = document.createElement("canvas");
+            fp.framebuffer.width = fp.width;
+            fp.framebuffer.height = fp.height;
+            fp.ctx = fp.framebuffer.getContext("2d");
+
+            // Start rendering when the video is playing
+            fp.playHandler = function () {
+                // check if video frames are ready, if not try again a bit later.
+                if (0 == fp.video.videoWidth || 0 == fp.video.videoHeight) {
+                    setTimeout(fp.playHandler, 10);
+                    return;
+                }
+
+                fp.canvas.width = fp.video.videoWidth;
+                fp.canvas.height = fp.video.videoHeight;
+                fp.width = fp.canvas.width;
+                fp.height = fp.canvas.height;
+                fp.framebuffer.width = fp.width;
+                fp.framebuffer.height = fp.height;
+                fp.render();
+            }
+            fp.video.addEventListener("play", fp.playHandler, false);
+
+            fp.color_change_speed = 10;
+
+            function _freeArray(heapBytes) {
+                Module._free(heapBytes.byteOffset);
+            }
+
+            function _arrayToHeap(typedArray) {
+                var numBytes = typedArray.length * typedArray.BYTES_PER_ELEMENT;
+                var ptr = Module._malloc(numBytes);
+                var heapBytes = Module.HEAPU8.subarray(ptr, ptr + numBytes);
+                heapBytes.set(typedArray);
+                return heapBytes;
+            }
+
+
+
+
+
+
+            // Compute and display the next frame
+            fp.renderFrame = function () {
+                
+
+
+                
+                // Acquire a video frame from the video element
+                fp.ctx.drawImage(fp.video, 0, 0, fp.video.videoWidth,
+                    fp.video.videoHeight, 0, 0, fp.width, fp.height);
+
+                var img_data = fp.ctx.getImageData(0, 0, fp.width, fp.height);
+
+                if (!fp.frame_bytes) {
+                    fp.frame_bytes = _arrayToHeap(img_data.data);
+                    
+                }
+                else if (fp.frame_bytes.length !== img_data.data.length) {
+                    _freeArray(fp.frame_bytes); // free heap memory
+                    fp.frame_bytes = _arrayToHeap(img_data.data);
+                }
+                else {
+                    fp.frame_bytes.set(img_data.data);
+                }
+
+
+                // ##################
+
+                // copy output to ImageData
+                //img_data.data.set(fp.frame_bytes);
+                // Render to viewport: antes de aplicar funções
+                //fp.viewport2.putImageData(img_data, 0, 0);
+
+                // Perform operation on copy, no additional conversions needed, direct pointer manipulation
+                // results will be put directly into the output param.
+
+
+                //stat.start("teste_match");
+
+
+                var arrayDataToPass = [0,0]
+                let buffer
+                let error
+                let result
+
+                try {
+                    // Init the typed array with the same length as the number of items in the array parameter
+                    const typedArray = new Float32Array(arrayDataToPass.length)
+
+                    // Populate the array with the values
+                    for (let i=0; i<arrayDataToPass.length; i++) {
+                        typedArray[i] = arrayDataToPass[i]
+                    }
+
+                    // Allocate some space in the heap for the data (making sure to use the appropriate memory size of the elements)
+                    buffer = Module._malloc(typedArray.length * typedArray.BYTES_PER_ELEMENT)
+
+                    // Assign the data to the heap - Keep in mind bytes per element
+                    Module.HEAPF64.set(typedArray, buffer >> 2)
+
+                    // Finally, call the function with "number" parameter type for the array (the pointer), and an extra length parameter
+                    //result = Module.ccall("addNums", null, ["number", "number"], [buffer, arrayDataToPass.length])
+
+                    //result = Module.ccall("doubleValues", null, ["number", "number"], [buffer, arrayDataToPass.length])
+
+                    //console.log("inicio");
+                    result = Module._teste_match(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, frameIndex, buffer, arrayDataToPass.length);
+                    //console.log("fim");
+
+                } catch (e) {
+                    error = e
+                } finally {
+                    // To avoid memory leaks we need to always clear out the allocated heap data
+                    // This needs to happen in the finally block, otherwise thrown errors will stop code execution before this happens
+                    Module._free(buffer)
+                }
+
+                // Finally, throw any errors so that we know when something goes wrong
+                if (error) throw error
+
+
+
+
+            
+                //console.log("inicio 2");
+
+                var arrayData = []
+
+                for (let v=0; v<arrayDataToPass.length; v++) {
+                    arrayData.push(Module.HEAPF64[result/Float64Array.BYTES_PER_ELEMENT+v])
+                }
+
+                console.log("P = " + arrayData[0]);
+                //console.log("L = " + arrayData[1]);
+
+                myGameArea.clear();
+                myGamePiece.moveAngle = 0;
+                myGamePiece.speed = 0;
+
+
+                var depth = arrayData[0];
+                var side = arrayData[1];
+
+
+                if(depth < 0.98) {
+                    //$("#log-f-t").html("FRENTE");
+                    //console.log("FRENTE");
+                    myGamePiece.speed = -1;
+
+                } else if(depth > 1.02) {
+                    //$("#log-f-t").html("TRAS");
+                    //console.log("TRAS");
+                    myGamePiece.speed = 1;
+
+                } else {
+                    //$("#log-f-t").html("CENTRO F-T");
+                    //console.log("PARADO F-T");
+                    myGamePiece.speed = 0;
+
+                }
+
+                if(side < -5) {
+                    //$("#log-d-e").html("DIREITA");
+                    //console.log("DIREITA");
+                    myGamePiece.moveAngle = 1;
+                } else if(side > 5) {
+                    //$("#log-d-e").html("ESQUERDA");
+                    //console.log("ESQUERDA");
+                    myGamePiece.moveAngle = -1;
+                } else {
+                    //$("#log-d-e").html("CENTRO D-E");
+                    //console.log("PARADO D-E");
+                    myGamePiece.moveAngle = 0;
+                }
+
+                myGamePiece.newPos();
+                myGamePiece.update();
+
+
+                //console.log("fim 2");
+
+
+
+                
+                //Module._teste_features(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset);
+
+
+                //Module._teste_gray(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, frameIndex);
+
+                //stat.stop("teste_match");
+                
+
+                
+
+
+                
+
+                // copy output to ImageData
+                img_data.data.set(fp.frame_bytes);
+                // Render to viewport: depois de aplicar as funções
+                fp.viewport.putImageData(img_data, 0, 0);
+
+                
+
+                frameIndex++;
+
+                
+                
+            };
+
+            // Rendering call-back
+            fp.render = function () {
+                
+                //stat.new_frame();
+                stats.begin();
+                
+                if (fp.video.paused || fp.video.ended) {
+                    return;
+                }
+                fp.renderFrame();
+
+                stats.end();
+
+                var self = fp;
+                requestAnimationFrame(self.render);
+
+                //console.log(stat.log());
+                
+            };
+
+            // Some platforms seem to disable autoplay
+            // so wait a moment and display the controls and call play() manually
+            // setTimeout(function() {
+            //     var isPlaying = 0 < fp.video.currentTime && !fp.video.paused && !fp.video.ended && 2 < fp.video.readyState;
+            //     if (!isPlaying) {
+            //         fp.video.controls = true;
+            //         fp.video.play();
+            //     }
+            // }, 200);
+
+            
+
+            return fp;
+        };
+
+    }
+
+    
+
+
+
+
+
+    // $(window).load(function() {
+    //     "use strict";
+
+    //     $(window).unload(function() {
+    //         video.pause();
+    //         video.src=null;
+    //     });
+    // });
+</script>
+
+<script type="text/javascript" src='app_tcc_wasm.js'></script>
+
+</body>
+</html>
