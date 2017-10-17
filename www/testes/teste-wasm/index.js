@@ -1,8 +1,8 @@
 var cameraFlags = {video: {
   //facingMode: {exact: "environment"},
   //deviceId: {exact: "e6cb32e3da6356f1c650fd7136b2cbfa6f1a76950a69326baab56b6f8da3c346"},
-  width: {exact: 320},
-  height: {exact: 240}
+  width: {exact: 640},
+  height: {exact: 480}
 },  
   audio: false
 };
