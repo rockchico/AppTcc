@@ -332,7 +332,7 @@ var Module = {
                     //result = Module.ccall("doubleValues", null, ["number", "number"], [buffer, arrayDataToPass.length])
 
                     //console.log("inicio");
-                    Module._teste_vo(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, frameIndex, buffer, arrayDataToPass.length);
+                    result = Module._teste_vo(img_data.width, img_data.height, fp.frame_bytes.byteOffset, fp.frame_bytes.byteOffset, frameIndex, buffer, arrayDataToPass.length);
                     //console.log("fim");
 
                 } catch (e) {
@@ -349,10 +349,18 @@ var Module = {
 
 
 
-            
+                var arrayData = []
+
+                for (let v=0; v<arrayDataToPass.length; v++) {
+                    arrayData.push(Module.HEAPF64[result/Float64Array.BYTES_PER_ELEMENT+v])
+                }
+
+                var x = arrayData[0];
+                var y = arrayData[1];
                 
 
-                
+                console.log("X = " + arrayData[0]);
+                console.log("Y = " + arrayData[1]);
 
 
                 
