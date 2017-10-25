@@ -44,6 +44,7 @@
             margin-top: 0px;
             position: absolute;
             background-color: #0e90d2;
+            background: url("Pattern_Grid_16x16.png");
         }
 
 
@@ -92,8 +93,8 @@ var featuresReady = checkFeatures(document.getElementById("info"), {webrtc: true
 
 var Module = {
     //wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
-    //wasmBinaryFile: 'https://192.168.99.15/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
-    wasmBinaryFile: 'https://192.168.43.189/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
+    wasmBinaryFile: 'https://192.168.99.18/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
+    //wasmBinaryFile: 'https://192.168.43.189/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
 
     _main: function() {
         WasmIsReady();
@@ -123,34 +124,19 @@ var Module = {
     stats.showPanel( 0 ); // 0: fps, 1: ms, 2: mb, 3+: custom
     document.body.appendChild( stats.dom );
 
+    var homo3x3 = [];
+
 
     // #################################################
 
     var myGamePiece;
 
     function startGame() {
-        myGamePiece = new component(20, 20, "red", 225, 225);
+        myGamePiece = new component(50, 50, "red", 300, 300);
         myGameArea.start();
     }
 
     var myGameArea = {
-
-        points: [],
-        maxPoints: 100,
-        countPoint: 0,
-
-        addPoint: function (point) {
-
-            if(this.countPoint < this.maxPoints) {
-                this.points.push(point);
-                this.countPoint ++;
-            } else {
-                this.points.shift();
-
-                this.points.push(point);
-            }
-
-        },
 
         canvas : document.getElementById("ballScene"),
 
@@ -185,23 +171,7 @@ var Module = {
             ctx.fillStyle = color;
             ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);
 
-            //var car = new Image();
-            //car.src="img/seta.png";
-            //ctx.drawImage(car, x, y);
-
             ctx.restore();
-
-            myGameArea.addPoint({"x": this.x, "y": this.y});
-
-
-            for(var i = 0; i < myGameArea.points.length; i++) {
-
-                ctx.beginPath();
-                ctx.arc(myGameArea.points[i].x, myGameArea.points[i].y, 3, 0, 2 * Math.PI, false);
-                ctx.fillStyle = 'green';
-                ctx.fill();
-
-            }
         }
         this.newPos = function() {
             this.angle += this.moveAngle * Math.PI / 180;
@@ -211,7 +181,147 @@ var Module = {
     }
 
     // #################################################
+    function tCorners(M, w, h) {
+        var pt = [{'x': 0, 'y': 0}, {'x': w, 'y': 0}, {'x': w, 'y': h}, {'x': 0, 'y': h}];
+        var z = 0.0, i = 0, px = 0.0, py = 0.0;
 
+        for (; i < 4; ++i) {
+            px = M[0] * pt[i].x + M[1] * pt[i].y + M[2];
+            py = M[3] * pt[i].x + M[4] * pt[i].y + M[5];
+            z = M[6] * pt[i].x + M[7] * pt[i].y + M[8];
+            //z = 1;
+            pt[i].x = px / z;
+            pt[i].y = py / z;
+            pt[i].z = z;
+        }
+
+        return pt;
+    }
+
+    function render_pattern_shape(ctx, shift) {
+
+
+
+
+            // get the projected pattern corners
+            var shape_pts = tCorners(homo3x3.data, videoWidth, videoHeight);
+
+            var fit = 50;
+
+            var sup_left_x = shape_pts[0].x + fit;
+            var sup_left_y = shape_pts[0].y + fit;
+
+            var sup_right_x = shape_pts[1].x - fit;
+            var sup_right_y = shape_pts[1].y + fit;
+
+            var inf_right_x = shape_pts[2].x - fit;
+            var inf_right_y = shape_pts[2].y - fit;
+
+            var inf_left_x = shape_pts[3].x + fit;
+            var inf_left_y = shape_pts[3].y -fit ;
+
+            var center_x = videoWidth / 2;
+            var center_y = videoHeight / 2;
+
+
+            ctx.strokeStyle = "#0F0";
+            ctx.beginPath();
+            ctx.moveTo(sup_left_x , sup_left_y);
+            ctx.lineTo(sup_right_x , sup_right_y);
+            ctx.lineTo(inf_right_x , inf_right_y);
+            ctx.lineTo(inf_left_x , inf_left_y);
+            ctx.lineTo(sup_left_x , sup_left_y);
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            var lado = 10;
+            ctx.fillStyle = '#006400';
+            ctx.fillRect(sup_left_x, sup_left_y, lado, lado);
+            ctx.fillStyle = '#FFFF00';
+            ctx.fillRect(sup_right_x - lado, sup_right_y, lado, lado);
+            ctx.fillStyle = '#ff8B8B';
+            ctx.fillRect(inf_right_x + shift - lado, inf_right_y - lado, lado, lado);
+            ctx.fillStyle = '#FF4500';
+            ctx.fillRect(inf_left_x, inf_left_y - lado, lado, lado);
+
+            // marca o centro do quadro
+            ctx.fillStyle = '#FF007F'  ;
+            ctx.fillRect(center_x - (lado / 2), center_y - (lado / 2), lado, lado);
+
+
+
+            // desenha as linas centrais
+            ctx.strokeStyle = "#00f";
+            ctx.beginPath();
+            ctx.moveTo(videoWidth / 2, 0);
+            ctx.lineTo(videoWidth / 2, videoHeight);
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.strokeStyle = "#00f";
+            ctx.beginPath();
+            ctx.moveTo(0, videoHeight/2);
+            ctx.lineTo(videoWidth, videoHeight/2);
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // desenha quadro estático
+            ctx.strokeStyle = "#aF0";
+            ctx.beginPath();
+            ctx.moveTo(0 , 0);
+            ctx.lineTo(videoWidth , 0);
+            ctx.lineTo(videoWidth , videoHeight);
+            ctx.lineTo(0 , videoHeight);
+            ctx.lineTo(0 , 0);
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+
+
+//            var i = 0;
+//            var string = "";
+//
+//            for(var r = 0; r < 3; r++) {
+//                for(var c = 0; c < 3; c++) {
+//
+//                    string += "[ "+homo3x3.data[i]+" ] ";
+//                    i++;
+//                }
+//                string += "\n";
+//            }
+
+//            console.log("homo3x3.data");
+//            console.log(string);
+
+            //console.log("homo3x3.data[4]");
+            //console.log("profundidade =     "+homo3x3.data[4]); // escala de profundidade
+            //console.log("lateral =          "+homo3x3.data[2]); // deslocalmento lateral
+
+
+
+            //kFilter.addValue(homo3x3.data[4]);
+            //kFilter.run();
+
+            //kFilter2.addValue(homo3x3.data[2]);
+            //kFilter2.run();
+
+            //console.log("getMeasuredValues");
+            //console.log(kFilter.getMeasuredValues());
+
+            //console.log("profundidade =     "+kFilter.getFilteredValue());
+            //console.log("lateral =          "+kFilter2.getFilteredValue());
+
+
+            //$("#log-debug").append("<span style='font-size: 24pt;'> [ "+homo3x3.data[4]+" ] | [ "+homo3x3.data[2]+" ] </span><br>");
+//            if((frameCount % 20) == 0) {
+//                $("#log-debug").html("");
+//            }
+
+
+            
+
+
+
+        }
     
 
 
@@ -279,8 +389,6 @@ var Module = {
                 fp.render();
             }
             fp.video.addEventListener("play", fp.playHandler, false);
-
-            fp.color_change_speed = 10;
 
             function _freeArray(heapBytes) {
                 Module._free(heapBytes.byteOffset);
@@ -393,19 +501,8 @@ var Module = {
                 var depth = arrayData[0];
                 var side = arrayData[1];
 
-                //console.log("P = " + arrayData[0]);
-                //console.log("L = " + arrayData[1]);
-
-                if(frameIndex % 2 == 0) {
-                    //console.log("frameIndex " + frameIndex);
-
-                    lastDepth = depth;
-
-                } else {
-                    //console.log("depth diference " + (lastDepth - depth));
-                }
-
-
+                console.log("P = " + arrayData[0]);
+                console.log("L = " + arrayData[1]);
 
 
                 myGameArea.clear();
@@ -416,34 +513,35 @@ var Module = {
                 
 
 
-                if(depth < -0.9) {
+                if(depth < 0.98) {
                     //$("#log-f-t").html("FRENTE");
-                    //console.log("TRAS");
-                    myGamePiece.speed += -1;
+                    console.log("FRENTE");
+                    myGamePiece.speed = 1;
 
-                } else if(depth > 1.1) {
+                } else if(depth > 1.02) {
                     //$("#log-f-t").html("TRAS");
-                    //console.log("FRENTE");
-                    myGamePiece.speed += 1;
+                    console.log("TRAS");
+                    myGamePiece.speed = -1;
 
                 } else {
                     //$("#log-f-t").html("CENTRO F-T");
-                    //console.log("PARADO F-T");
+                    console.log("PARADO F-T");
                     myGamePiece.speed = 0;
 
                 }
 
-                if(side < -5) {
+
+                if(side < -10) {
                     //$("#log-d-e").html("DIREITA");
-                    //console.log("DIREITA");
-                    myGamePiece.moveAngle += 1;
-                } else if(side > 5) {
+                    console.log("DIREITA");
+                    myGamePiece.moveAngle = 1;
+                } else if(side > 10) {
                     //$("#log-d-e").html("ESQUERDA");
-                    //console.log("ESQUERDA");
-                    myGamePiece.moveAngle += -1;
+                    console.log("ESQUERDA");
+                    myGamePiece.moveAngle = -1;
                 } else {
                     //$("#log-d-e").html("CENTRO D-E");
-                    //console.log("PARADO D-E");
+                    console.log("PARADO D-E");
                     myGamePiece.moveAngle = 0;
                 }
 
@@ -472,7 +570,7 @@ var Module = {
                 // copy output to ImageData
                 img_data.data.set(fp.frame_bytes);
                 // Render to viewport: depois de aplicar as funções
-                fp.viewport.putImageData(img_data, 0, 0);
+                //fp.viewport.putImageData(img_data, 0, 0);
 
                 
 

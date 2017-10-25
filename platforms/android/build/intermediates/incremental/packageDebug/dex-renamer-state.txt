@@ -1,4 +1,4 @@
-#Wed Oct 18 17:34:01 BRST 2017
+#Tue Oct 24 23:46:17 BRST 2017
 base.0=/var/www/html/AppTcc/platforms/android/build/intermediates/transforms/dex/debug/folders/1000/1f/main
 renamed.0=classes.dex
 file.0=/var/www/html/AppTcc/platforms/android/build/intermediates/transforms/dex/debug/folders/1000/1f/main/classes.dex
