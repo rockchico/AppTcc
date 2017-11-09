@@ -97,8 +97,8 @@ var featuresReady = checkFeatures(document.getElementById("info"), {webrtc: true
 
 
 var Module = {
-    //wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
-    wasmBinaryFile: 'https://192.168.99.16/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
+    wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
+    //wasmBinaryFile: 'https://192.168.99.16/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
     //wasmBinaryFile: 'https://192.168.43.189/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
 
     _main: function() {
@@ -435,8 +435,8 @@ var Module = {
                 var depth = homography[4];
                 var side = homography[2];
 
-                console.log("P = " + depth);
-                console.log("L = " + side);
+                //console.log("P = " + depth);
+                //console.log("L = " + side);
 
                 kFilter_p.addValue(depth);
                 kFilter_p.run();
@@ -460,13 +460,13 @@ var Module = {
                 myGamePiece.moveAngle = 0;
                 myGamePiece.speed = 0;
 
-                if(depth < 0.97) {
+                if(depth < 0.96) {
                     //$("#log-f-t").html("TRAS");
-                    console.log("F/T = TRAS");
+                    //console.log("F/T = TRAS");
 
                     myGamePiece.speed = 1;
 
-                } else if(depth > 1.03) {
+                } else if(depth > 1.04) {
                     //$("#log-f-t").html("FRENTE");
                     console.log("F/T = FRENTE");
                     

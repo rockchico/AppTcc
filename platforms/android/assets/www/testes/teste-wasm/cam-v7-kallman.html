@@ -98,7 +98,7 @@ var featuresReady = checkFeatures(document.getElementById("info"), {webrtc: true
 
 var Module = {
     wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
-    //wasmBinaryFile: 'https://192.168.99.18/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
+    //wasmBinaryFile: 'https://192.168.99.16/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
     //wasmBinaryFile: 'https://192.168.43.189/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
 
     _main: function() {
@@ -435,18 +435,20 @@ var Module = {
                 var depth = homography[4];
                 var side = homography[2];
 
-                console.log("P = " + homography[4]);
-                console.log("L = " + homography[2]);
+                //console.log("P = " + depth);
+                //console.log("L = " + side);
 
-                kFilter_p.addValue(homography[4]);
+                kFilter_p.addValue(depth);
                 kFilter_p.run();
 
-                kFilter_l.addValue(homography[2]);
+                kFilter_l.addValue(side);
                 kFilter_l.run();
 
+                depth = kFilter_p.getFilteredValue();
+                side = kFilter_l.getFilteredValue();
 
-                console.log("profundidade =     "+kFilter_p.getFilteredValue());
-                console.log("lateral =          "+kFilter_l.getFilteredValue());
+                console.log("P(k) = " + depth);
+                console.log("L(k) = " + side);
 
                 
 
@@ -458,21 +460,21 @@ var Module = {
                 myGamePiece.moveAngle = 0;
                 myGamePiece.speed = 0;
 
-                if(depth < 0.97) {
+                if(depth < 0.96) {
                     //$("#log-f-t").html("TRAS");
-                    //console.log("TRAS");
+                    //console.log("F/T = TRAS");
 
                     myGamePiece.speed = 1;
 
-                } else if(depth > 1.03) {
+                } else if(depth > 1.04) {
                     //$("#log-f-t").html("FRENTE");
-                    //console.log("FRENTE");
+                    console.log("F/T = FRENTE");
                     
                     myGamePiece.speed = -1;
 
                 } else {
                     //$("#log-f-t").html("CENTRO F-T");
-                    //console.log("PARADO F-T");
+                    console.log("F/T = PARADO");
 
                     myGamePiece.speed = 0;
 
@@ -483,15 +485,15 @@ var Module = {
 
                 if(side < -10) {
                     //$("#log-d-e").html("DIREITA");
-                    //console.log("DIREITA");
+                    //console.log("D/E = DIREITA");
                     myGamePiece.moveAngle = 1;
                 } else if(side > 10) {
                     //$("#log-d-e").html("ESQUERDA");
-                    //console.log("ESQUERDA");
+                    //console.log("D/E = ESQUERDA");
                     myGamePiece.moveAngle = -1;
                 } else {
                     //$("#log-d-e").html("CENTRO D-E");
-                    //console.log("PARADO D-E");
+                    //console.log("D/E = PARADO");
                     myGamePiece.moveAngle = 0;
                 }
 

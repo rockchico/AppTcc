@@ -1,29 +1,14 @@
 /**
  * Created by francisco on 01/08/17.
  */
-
-
-
-
-
-
-
-
 function Filter() {
 
 
-    var maxElements = 500;
+    var maxElements = 1000;
     var elementCount = 0;
 
 
     var measuredValuesArray = [];
-
-
-
-
-
-
-
 
     var options = {
         stateTransition: 1.0,

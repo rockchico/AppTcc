@@ -644,7 +644,7 @@ function htmlPlacesList(obj) {
         '<div class="card-content">' +
             '<div class="card-content-inner">Info lugar</div>' +
         '</div>' +
-        '<div class="card-footer">Card Footer</div>' +
+        '<div class="card-footer"></div>' +
         '</div>';
 
 
