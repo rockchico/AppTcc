@@ -364,20 +364,20 @@ var Module = {
 
                 var arrayDataToPass = [0,0,0,0,0,0,0,0,0];
                 let buffer;
-                let error;
                 let result;
 
                 try {
 
                     // inicia o typed array com o mesmo tamanho do número de intens do array
-                    const typedArray = new Float32Array(arrayDataToPass.length)
+                    const typedArray = new Float32Array(arrayDataToPass.length);
 
                     // popula o array com os valores
                     for (let i=0; i < arrayDataToPass.length; i++) {
                         typedArray[i] = arrayDataToPass[i]
                     }
 
-                    // aloca espaço na memória utilizada pelo WebAssembly , levando em consideração o tamanho do array e bytes por elemento
+                    // aloca espaço na memória utilizada pelo WebAssembly 
+                    // levando em consideração o tamanho do array e bytes por elemento
                     buffer = Module._malloc(typedArray.length * typedArray.BYTES_PER_ELEMENT)
 
                     // copia os dados no espaço de memória
@@ -386,15 +386,11 @@ var Module = {
                     // chama a função WebAssembly criada para calcular a homografia
                     result = Module._vo_homography(img_data.width, img_data.height, fp.frame_bytes.byteOffset, frameIndex, buffer, arrayDataToPass.length);
 
-
                 } catch (e) {
-                    error = e
+                    throw e
                 } finally {
-
                     Module._free(buffer)
                 }
-
-                if (error) throw error
 
                 // popula o array com o resultado da homografia obtido a partir da função WebAssembly
                 var homography = []
