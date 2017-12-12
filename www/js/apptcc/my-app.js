@@ -19,6 +19,7 @@
  */
 
 //var appTccServer = "192.168.0.114";
+//var appTccServer = "192.168.99.14";
 var appTccServer = "10.1.0.3";
 //var appTccServer = "ec2-13-58-57-157.us-east-2.compute.amazonaws.com";
 
@@ -208,7 +209,7 @@ myApp.onPageInit('map', function (page) {
 
 
         var imageCapture = new ImageCapture();
-        imageCapture.uri = "http://admin:teste123@"+appTccServer+":9999/api/search";
+        imageCapture.uri = "http://admin:admin@"+appTccServer+":9999/api/search";
         imageCapture.OnUploadSucess = callBackOnUploadSucess;
         imageCapture.doCapture();
 
@@ -444,7 +445,7 @@ myApp.onPageInit('place-images', function (page) {
 
 
             var imageCapture = new ImageCapture();
-            imageCapture.uri = "http://admin:teste123@"+appTccServer+":9999/api/images";
+            imageCapture.uri = "http://admin:admin@"+appTccServer+":9999/api/images";
             imageCapture.uploadParams = {id: lastInsertId, keys: "place_id", values: ""+place_id+""}
 
             imageCapture.OnUploadSucess = function () {

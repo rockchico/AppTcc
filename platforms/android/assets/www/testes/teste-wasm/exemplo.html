@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<body>
+<script>
+
+var Module = {
+    wasmBinaryFile: 'app_tcc_wasm.wasm',  // define o arquivo .wasm que deve ser carregado
+
+    _main: function() { // função chamada quando módulo WebAssembly esta pronto
+        console.log("WASM Pronto"); 
+    },
+    _exit: function(x) {
+        console.log("fim do programa");
+    }
+};
+</script>
+
+<script type="text/javascript">
+    
+    ... 
+
+    let homography_matrix;
+    let homography_matrix_size = 9; // matrix 3x3
+    try {
+
+        // chama a função WebAssembly criada para calcular a homografia
+        homography_matrix = Module._vo_homography(img_data.width,      // largura da imagem
+                                        img_data.height,    // altura da imagem
+                                        fp.frame_bytes.byteOffset, // ponteiro referenciando a imagem
+                                        frameIndex, // número do frame
+                                        homography_matrix_size); // tamanho do vetor de resultados
+
+    } catch (e) {
+        throw e
+    }
+    // popula o array com o resultado da homografia obtido a partir da função WebAssembly
+    var homography = [];
+    for (let v = 0; v < homography_matrix_size; v++) {
+        homography.push(Module.HEAPF64[homography_matrix / Float64Array.BYTES_PER_ELEMENT + v])
+    }
+    
+    ...
+
+</script>
+<script type="text/javascript" src='app_tcc_wasm.js'></script>
+</body>
+</html>

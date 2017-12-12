@@ -1,4 +1,3 @@
-
 <!doctype html>
 
 <html>
@@ -67,7 +66,7 @@
 
 
     <canvas id='ballScene' width='600px' height='600px'></canvas>
-    <img id="triangle" src="triangle.png" alt="The Scream" width="40" height="60">
+    <img id="triangle" src="quadrado.png" width="40" height="40">
 
 </div>
 
@@ -87,17 +86,13 @@ var featuresReady = checkFeatures(document.getElementById("info"), {webrtc: true
 
 
 var Module = {
-    //wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
-    wasmBinaryFile: 'https://192.168.99.12/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
+    wasmBinaryFile: 'https://10.1.0.3/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
+    //wasmBinaryFile: 'https://192.168.99.14/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
     //wasmBinaryFile: 'https://192.168.43.189/AppTcc/www/testes/teste-wasm/app_tcc_wasm.wasm',
 
     _main: function() {
         WasmIsReady();
         startCamera();
-
-        window.onload = function () {
-            
-        };
 
         initApp();
         
@@ -122,7 +117,7 @@ var Module = {
     var myGamePiece;
 
     function startGame() {
-        myGamePiece = new component(50, 50, "red", 300, 300);
+        myGamePiece = new component(50, 50, 300, 300);
         myGameArea.start();
     }
 
@@ -141,11 +136,10 @@ var Module = {
         }
     }
 
-    function component(width, height, color, x, y, type) {
+    function component(width, height, x, y) {
 
         var ctx;
 
-        this.type = type;
         this.width = width;
         this.height = height;
         this.speed = 10;
@@ -157,13 +151,25 @@ var Module = {
             ctx = myGameArea.context;
             ctx.save();
             ctx.translate(this.x, this.y);
+
+            
+
+            // Move registration point to the center of the canvas
+            // 600 é o tamanho da grade
+            //ctx.translate(this.x/2, this.y/2);
+
+            //console.log("x = "+this.x+" y = "+this.y);
+
             ctx.rotate(this.angle);
+
+            // Move registration point back to the top left corner of canvas
+            //ctx.translate(-this.x/2, -this.y/2);
 
             //ctx.fillStyle = color;
             //ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);
 
             var img = document.getElementById("triangle");
-            ctx.drawImage(img, 40, 60);
+            ctx.drawImage(img, 40, 40);
 
             ctx.restore();
         }
@@ -233,14 +239,14 @@ var Module = {
         ctx.stroke();
 
         var lado = 5;
-        ctx.fillStyle = '#006400';
-        ctx.fillRect(sup_left_x, sup_left_y, lado, lado);
-        ctx.fillStyle = '#FFFF00';
-        ctx.fillRect(sup_right_x - lado, sup_right_y, lado, lado);
-        ctx.fillStyle = '#ff8B8B';
-        ctx.fillRect(inf_right_x + shift - lado, inf_right_y - lado, lado, lado);
-        ctx.fillStyle = '#FF4500';
-        ctx.fillRect(inf_left_x, inf_left_y - lado, lado, lado);
+        // ctx.fillStyle = '#006400';
+        // ctx.fillRect(sup_left_x, sup_left_y, lado, lado);
+        // ctx.fillStyle = '#FFFF00';
+        // ctx.fillRect(sup_right_x - lado, sup_right_y, lado, lado);
+        // ctx.fillStyle = '#ff8B8B';
+        // ctx.fillRect(inf_right_x + shift - lado, inf_right_y - lado, lado, lado);
+        // ctx.fillStyle = '#FF4500';
+        // ctx.fillRect(inf_left_x, inf_left_y - lado, lado, lado);
 
         // marca o centro do quadro
         ctx.fillStyle = '#FF007F'  ;
@@ -359,44 +365,25 @@ var Module = {
                 }
 
 
-                // ##################
-
-
-                var arrayDataToPass = [0,0,0,0,0,0,0,0,0];
-                let buffer;
-                let result;
-
+                // #################
+                let homography_matrix;
+                let homography_matrix_size = 9; // matrix 3x3
                 try {
 
-                    // inicia o typed array com o mesmo tamanho do número de intens do array
-                    const typedArray = new Float32Array(arrayDataToPass.length);
-
-                    // popula o array com os valores
-                    for (let i=0; i < arrayDataToPass.length; i++) {
-                        typedArray[i] = arrayDataToPass[i]
-                    }
-
-                    // aloca espaço na memória utilizada pelo WebAssembly 
-                    // levando em consideração o tamanho do array e bytes por elemento
-                    buffer = Module._malloc(typedArray.length * typedArray.BYTES_PER_ELEMENT)
-
-                    // copia os dados no espaço de memória
-                    Module.HEAPF64.set(typedArray, buffer >> 9)
-
                     // chama a função WebAssembly criada para calcular a homografia
-                    result = Module._vo_homography(img_data.width, img_data.height, fp.frame_bytes.byteOffset, frameIndex, buffer, arrayDataToPass.length);
+                    homography_matrix = Module._vo_homography(img_data.width,      // largura da imagem
+                                                    img_data.height,    // altura da imagem
+                                                    fp.frame_bytes.byteOffset, // ponteiro referenciando a imagem
+                                                    frameIndex, // número do frame
+                                                    homography_matrix_size); // tamanho do vetor de resultados
 
                 } catch (e) {
                     throw e
-                } finally {
-                    Module._free(buffer)
                 }
-
                 // popula o array com o resultado da homografia obtido a partir da função WebAssembly
-                var homography = []
-
-                for (let v = 0; v < arrayDataToPass.length; v++) {
-                    homography.push(Module.HEAPF64[result/Float64Array.BYTES_PER_ELEMENT+v])
+                var homography = [];
+                for (let v = 0; v < homography_matrix_size; v++) {
+                    homography.push(Module.HEAPF64[homography_matrix / Float64Array.BYTES_PER_ELEMENT + v])
                 }
 
                 var depth = homography[4];
@@ -420,19 +407,19 @@ var Module = {
 
                 if(depth < 0.97) {
                     //$("#log-f-t").html("TRAS");
-                    //console.log("F/T = TRAS");
+                    console.log("F/T = TRÁS");
 
                     myGamePiece.speed = 1;
 
                 } else if(depth > 1.03) {
                     //$("#log-f-t").html("FRENTE");
-                    //console.log("F/T = FRENTE");
+                    console.log("F/T = FRENTE");
                     
                     myGamePiece.speed = -1;
 
                 } else {
                     //$("#log-f-t").html("CENTRO F-T");
-                    //console.log("F/T = PARADO");
+                    console.log("F/T = PARADO");
 
                     myGamePiece.speed = 0;
 
@@ -443,15 +430,15 @@ var Module = {
 
                 if(side < -10) {
                     //$("#log-d-e").html("DIREITA");
-                    //console.log("D/E = DIREITA");
+                    console.log("D/E = DIREITA");
                     myGamePiece.moveAngle = 1;
                 } else if(side > 10) {
                     //$("#log-d-e").html("ESQUERDA");
-                    //console.log("D/E = ESQUERDA");
+                    console.log("D/E = ESQUERDA");
                     myGamePiece.moveAngle = -1;
                 } else {
                     //$("#log-d-e").html("CENTRO D-E");
-                    //console.log("D/E = PARADO");
+                    console.log("D/E = PARADO");
                     myGamePiece.moveAngle = 0;
                 }
 
@@ -459,7 +446,13 @@ var Module = {
                 myGamePiece.update();
 
 
-                img_data.data.set(fp.frame_bytes);                
+                
+                // copy output to ImageData
+                img_data.data.set(fp.frame_bytes);
+                // Render to viewport: depois de aplicar as funções
+                fp.viewport.putImageData(img_data, 0, 0);
+
+
 
                 frameIndex++;
 
